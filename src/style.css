@@ -1,19 +1,19 @@
 /* === IMPORT SF PRO DISPLAY === */
 @font-face {
   font-family: 'SF Pro Display';
-  src: url('/src/assets/fonts/SFPRODISPLAY-Regular.ttf') format('truetype');
+  src: url('/src/assets/fonts/SF-Pro-Display-Regular.otf') format('truetype');
   font-weight: 400;
 }
 
 @font-face {
   font-family: 'SF Pro Display';
-  src: url('/src/assets/fonts/SFPRODISPLAY-Medium.ttf') format('truetype');
+  src: url('/src/assets/fonts/SF-Pro-Display-Medium.otf') format('truetype');
   font-weight: 500;
 }
 
 @font-face {
   font-family: 'SF Pro Display';
-  src: url('/src/assets/fonts/SFPRODISPLAY-Bold.ttf') format('truetype');
+  src: url('/src/assets/fonts/SF-Pro-Display-Bold.otf') format('truetype');
   font-weight: 700;
 }
 
