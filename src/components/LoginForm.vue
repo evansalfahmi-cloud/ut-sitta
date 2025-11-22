@@ -1,10 +1,17 @@
 <template>
-  <div class="card p-4 shadow" style="width: 350px;">
-    <h3 class="text-center mb-4">Login SITTA UT</h3>
+  <div class="card p-4 shadow text-center" style="width: 350px; border-radius: 16px;">
+    
+    <!-- Logo UT -->
+    <div class="d-flex justify-content-center mb-3">
+      <img :src="logoUT" alt="UT Logo" style="height: 65px;" />
+    </div>
+
+    <!-- Judul Login -->
+    <h4 class="fw-bold mb-4">Login SITTA UT</h4>
     
     <form @submit.prevent="login">
       <!-- Username -->
-      <div class="mb-3">
+      <div class="mb-3 text-start">
         <label for="username" class="form-label">Username</label>
         <input 
           type="text" 
@@ -17,7 +24,7 @@
       </div>
 
       <!-- Password -->
-      <div class="mb-3 position-relative">
+      <div class="mb-3 position-relative text-start">
         <label for="password" class="form-label">Password</label>
         <input 
           :type="showPassword ? 'text' : 'password'" 
@@ -27,11 +34,11 @@
           placeholder="Masukkan password"
           required
         >
-        <!-- Icon mata untuk toggle password -->
+        <!-- Icon mata -->
         <i 
           class="bi" 
           :class="showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'" 
-          @click="togglePassword" 
+          @click="togglePassword"
           style="position:absolute; right:10px; top:38px; cursor:pointer;"
         ></i>
       </div>
@@ -39,7 +46,7 @@
       <!-- Login Button -->
       <button 
         type="submit" 
-        class="btn btn-primary w-100" 
+        class="btn btn-warning w-100 fw-semibold py-2"
         :disabled="!username || !password || loading"
       >
         <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
@@ -47,42 +54,37 @@
       </button>
     </form>
 
-    <!-- Error Message -->
+    <!-- Error -->
     <div v-if="error" class="alert alert-danger mt-3">{{ error }}</div>
+
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      username: '',
-      password: '',
-      showPassword: false,
-      loading: false,
-      error: ''
-    }
-  },
-  methods: {
-    togglePassword() {
-      this.showPassword = !this.showPassword;
-    },
-    login() {
-      this.error = '';
-      this.loading = true;
+<script setup>
+import { ref } from 'vue'
+import logoUT from '../img/ut.svg'   // logo UT dari folder src/img
 
-      // Simulasi delay login (misal call API backend)
-      setTimeout(() => {
-        this.loading = false;
-        if (this.username === 'admin' && this.password === '1234') {
-          alert('Login berhasil!');
-          this.error = '';
-          // nanti bisa redirect ke dashboard
-        } else {
-          this.error = 'Username atau password salah!';
-        }
-      }, 1500);
+const username = ref('')
+const password = ref('')
+const showPassword = ref(false)
+const loading = ref(false)
+const error = ref('')
+
+const togglePassword = () => {
+  showPassword.value = !showPassword.value
+}
+
+const login = () => {
+  error.value = ''
+  loading.value = true
+
+  setTimeout(() => {
+    loading.value = false
+    if (username.value === 'admin' && password.value === '1234') {
+      alert('Login berhasil!')
+    } else {
+      error.value = 'Username atau password salah!'
     }
-  }
+  }, 1500)
 }
 </script>
