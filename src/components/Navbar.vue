@@ -41,6 +41,16 @@
               Stok
             </a>
           </li>
+          
+           <!-- KERANJANG -->
+          <li class="nav-item">
+            <a class="nav-link"
+               :class="{ active: currentPage === 'keranjang' }"
+               href="#"
+               @click.prevent="$emit('changePage','keranjang')">
+              Keranjang
+            </a>
+          </li>
 
           <!-- TRACKING -->
           <li class="nav-item">
@@ -52,15 +62,7 @@
             </a>
           </li>
 
-          <!-- KERANJANG -->
-          <li class="nav-item">
-            <a class="nav-link"
-               :class="{ active: currentPage === 'keranjang' }"
-               href="#"
-               @click.prevent="$emit('changePage','keranjang')">
-              Keranjang
-            </a>
-          </li>
+         
 
         </ul>
 
