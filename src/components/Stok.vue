@@ -113,6 +113,7 @@
             <td>
               <div class="d-flex flex-column align-items-center">
                 <span class="fw-bold">{{ buku.qty }}</span>
+
                 <div v-if="user.role==='admin'" class="btn-group mt-1">
                   <button class="btn btn-sm btn-success" @click="increaseQty(index)">+</button>
                   <button class="btn btn-sm btn-warning" @click="decreaseQty(index)">-</button>

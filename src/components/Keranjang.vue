@@ -3,10 +3,12 @@
 
     <h3 class="fw-bold mb-4">Keranjang Buku</h3>
 
+    <!-- Jika kosong -->
     <div v-if="cart.length === 0" class="alert alert-info text-center">
       Keranjang masih kosong.
     </div>
 
+    <!-- Jika ada isi -->
     <div v-else class="card p-3 shadow">
 
       <table class="table table-striped align-middle">
@@ -24,7 +26,7 @@
         <tbody>
           <tr v-for="(buku, i) in cart" :key="i">
             <td>{{ buku.kode }}</td>
-            <td>{{ buku.judul }}</td>
+            <td class="text-start">{{ buku.judul }}</td>
             <td>{{ buku.upbjj }}</td>
             <td>Rp {{ buku.harga.toLocaleString() }}</td>
             <td>{{ buku.jumlah }}</td>
@@ -39,10 +41,12 @@
 
       </table>
 
+      <!-- TOTAL -->
       <div class="text-end fw-bold fs-5 mt-3">
         Total: Rp {{ totalHarga.toLocaleString() }}
       </div>
 
+      <!-- CHECKOUT -->
       <div class="text-end mt-3">
         <button class="btn btn-success" @click="checkout">
           <i class="bi bi-check-circle"></i> Checkout
@@ -51,7 +55,7 @@
 
     </div>
 
-    <!-- Popup Checkout -->
+    <!-- POPUP CHECKOUT -->
     <div v-if="checkoutSuccess" class="popup-overlay">
       <div class="popup-box text-center">
         <i class="bi bi-bag-check-fill text-success" style="font-size:60px"></i>
@@ -64,25 +68,26 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watchEffect } from "vue";
 
+/* ================= CART ================= */
 const cart = ref([]);
 
-/* ================= LOAD CART ================= */
 const loadCart = () => {
-  const saved = localStorage.getItem("cart");
-  cart.value = saved ? JSON.parse(saved) : [];
+  cart.value = JSON.parse(localStorage.getItem("cart") || "[]");
 };
 
 const saveCart = () => {
   localStorage.setItem("cart", JSON.stringify(cart.value));
 };
 
-/* ================= LOAD STOK ================= */
-const loadStok = () => {
-  const saved = localStorage.getItem("stokData");
-  return saved ? JSON.parse(saved) : [];
-};
+/* Auto load setiap kali localStorage berubah */
+watchEffect(() => {
+  loadCart();
+});
+
+/* ================= STOK ================= */
+const loadStok = () => JSON.parse(localStorage.getItem("stokData") || "[]");
 
 const saveStok = (stok) => {
   localStorage.setItem("stokData", JSON.stringify(stok));
@@ -92,22 +97,24 @@ const saveStok = (stok) => {
 const removeFromCart = (index) => {
   const buku = cart.value[index];
 
+  // Kembalikan stok sebanyak jumlahnya
   let stok = loadStok();
   let item = stok.find(s => s.kode === buku.kode);
 
   if (item) {
-    item.qty += buku.jumlah;
+    item.qty = Number(item.qty) + Number(buku.jumlah);
     saveStok(stok);
   }
 
+  // Hapus dari keranjang
   cart.value.splice(index, 1);
   saveCart();
 };
 
-/* ================= TOTAL HARGA ================= */
+/* ================= TOTAL ================= */
 const totalHarga = computed(() =>
   cart.value.reduce(
-    (sum, item) => sum + item.harga * item.jumlah,
+    (sum, item) => sum + Number(item.harga) * Number(item.jumlah),
     0
   )
 );
@@ -119,6 +126,7 @@ const checkout = () => {
   if (cart.value.length === 0)
     return alert("Keranjang kosong!");
 
+  // Keranjang dikosongkan, stok tidak berubah
   cart.value = [];
   saveCart();
 
@@ -133,13 +141,14 @@ onMounted(loadCart);
 </script>
 
 <style scoped>
+/* Popup */
 .popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0,0,0,0.4);
   display: flex;
   justify-content: center;
   align-items: center;
