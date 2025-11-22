@@ -60,12 +60,16 @@
 
     </div>
 
+    <!-- FOOTER -->
+    <Footer class="mt-auto" />
+
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import Navbar from './Navbar.vue'
+import Footer from './Footer.vue'
 
 const user = ref(null)
 const currentPage = ref('home')
@@ -90,10 +94,13 @@ const logout = () => {
 </script>
 
 <style scoped>
-/* Background seluruh dashboard */
 .dashboard-wrapper {
   background: white;
   min-height: 100vh;
+
+  /* agar footer di bawah */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Semua card utama punya lebar seragam */
