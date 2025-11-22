@@ -111,7 +111,7 @@
   </div>
 </template>
 
-<script setup>
+  <script setup>
 import { ref, computed, onMounted } from "vue";
 
 /* =======================================================
@@ -130,8 +130,7 @@ const saveCart = () => {
 /* =======================================================
    LOAD & SAVE STOK
 ======================================================= */
-const loadStok = () =>
-  JSON.parse(localStorage.getItem("stokData") || "[]");
+const loadStok = () => JSON.parse(localStorage.getItem("stokData") || "[]");
 
 const saveStok = (data) =>
   localStorage.setItem("stokData", JSON.stringify(data));
@@ -178,13 +177,63 @@ const ongkir = computed(() => {
 const totalAkhir = computed(() => totalHarga.value + ongkir.value);
 
 /* =======================================================
+   TRACKING GENERATOR
+======================================================= */
+const generateDOCode = () => {
+  let all = JSON.parse(localStorage.getItem("tracking") || "[]");
+  let next = String(all.length + 1).padStart(4, "0");
+  return `DO2025-${next}`;
+};
+
+/* =======================================================
    CHECKOUT
 ======================================================= */
 const checkoutSuccess = ref(false);
 
 const checkout = () => {
-  if (kurir.value === "") return alert("Silakan pilih kurir terlebih dahulu.");
+  if (kurir.value === "")
+    return alert("Silakan pilih kurir terlebih dahulu.");
 
+  if (cart.value.length === 0)
+    return alert("Keranjang masih kosong.");
+
+  // Ambil user login
+  const user = JSON.parse(localStorage.getItem("userLogin") || "{}");
+
+  // Buat kode DO
+  const kodeDO = generateDOCode();
+
+  // Tanggal kirim realtime
+  const now = new Date();
+  const tgl =
+    now.toLocaleDateString("id-ID") +
+    " " +
+    now.getHours().toString().padStart(2, "0") +
+    ":" +
+    now.getMinutes().toString().padStart(2, "0");
+
+  // Simpan ke localStorage tracking
+  let trackingList = JSON.parse(localStorage.getItem("tracking") || "[]");
+
+  trackingList.push({
+    do: kodeDO,
+    tanggal: tgl,
+    kurir: kurir.value,
+    ongkir: ongkir.value,
+    totalBayar: totalAkhir.value,
+    status: "Dalam Proses Pengiriman",
+    user: {
+      nama: user.nama,
+      nim: user.nim,
+      prodi: user.prodi,
+      upbjj: user.upbjj
+    },
+    buku: cart.value
+  });
+
+  localStorage.setItem("tracking", JSON.stringify(trackingList));
+
+  // Kosongkan keranjang
   cart.value = [];
   saveCart();
 
@@ -195,6 +244,7 @@ const closePopup = () => (checkoutSuccess.value = false);
 
 onMounted(loadCart);
 </script>
+
 
 <style scoped>
 .popup-overlay {
