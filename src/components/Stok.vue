@@ -3,10 +3,9 @@
 
     <h3 class="fw-bold mb-3">Stok Bahan Ajar</h3>
 
-    <!-- ========== FILTER & SORT ========== -->
+    <!-- FILTER & SORT -->
     <div class="row g-3 mb-3 align-items-end">
 
-      <!-- Filter Kategori -->
       <div class="col-md-3">
         <label class="form-label fw-semibold small">Kategori</label>
         <select v-model="filterKategori" class="form-select">
@@ -15,7 +14,6 @@
         </select>
       </div>
 
-      <!-- Filter UPBJJ -->
       <div class="col-md-3">
         <label class="form-label fw-semibold small">UPBJJ</label>
         <select v-model="filterUpbjj" class="form-select">
@@ -24,7 +22,6 @@
         </select>
       </div>
 
-      <!-- Filter Lokasi Rak -->
       <div class="col-md-3">
         <label class="form-label fw-semibold small">Lokasi Rak</label>
         <select v-model="filterRak" class="form-select">
@@ -33,7 +30,6 @@
         </select>
       </div>
 
-      <!-- Sorting -->
       <div class="col-md-2">
         <label class="form-label fw-semibold small">Urutkan</label>
         <select v-model="sortBy" class="form-select">
@@ -47,14 +43,13 @@
         </select>
       </div>
 
-      <!-- Reset -->
       <div class="col-md-1">
         <button class="btn btn-secondary btn-sm w-100" @click="resetFilter">Reset</button>
       </div>
 
     </div>
 
-    <!-- ========== ADMIN: TAMBAH BUKU ========== -->
+    <!-- ADMIN TAMBAH -->
     <div class="mb-3" v-if="user.role === 'admin'">
       <button class="btn btn-primary btn-sm" @click="showAddForm = !showAddForm">
         <i class="bi bi-plus-circle"></i> Tambah Buku
@@ -83,7 +78,7 @@
       </div>
     </div>
 
-    <!-- ========== TABEL ========== -->
+    <!-- TABEL -->
     <div class="table-responsive">
       <table class="table table-bordered table-striped align-middle text-center">
 
@@ -96,43 +91,38 @@
             <th>Harga</th>
             <th>Qty</th>
 
-            <!-- Safety + Status HANYA UNTUK ADMIN -->
-            <th v-if="user.role === 'admin'">Safety</th>
-            <th v-if="user.role === 'admin'">Status</th>
+            <th v-if="user.role==='admin'">Safety</th>
+            <th v-if="user.role==='admin'">Status</th>
 
             <th>Catatan</th>
 
-            <th v-if="user.role === 'admin'">Aksi</th>
-            <th v-if="user.role === 'user'">Keranjang</th>
+            <th v-if="user.role==='admin'">Aksi</th>
+            <th v-if="user.role==='user'">Keranjang</th>
           </tr>
         </thead>
 
         <tbody>
           <tr v-for="(buku, index) in sortedData" :key="buku.kode">
+
             <td>{{ buku.kode }}</td>
             <td class="text-start">{{ buku.judul }}</td>
             <td>{{ buku.upbjj }}</td>
             <td>{{ buku.lokasiRak }}</td>
             <td>Rp {{ buku.harga.toLocaleString() }}</td>
 
-            <!-- Qty -->
             <td>
               <div class="d-flex flex-column align-items-center">
                 <span class="fw-bold">{{ buku.qty }}</span>
-
-                <!-- ADMIN BUTTON +- -->
-                <div v-if="user.role === 'admin'" class="btn-group mt-1">
+                <div v-if="user.role==='admin'" class="btn-group mt-1">
                   <button class="btn btn-sm btn-success" @click="increaseQty(index)">+</button>
                   <button class="btn btn-sm btn-warning" @click="decreaseQty(index)">-</button>
                 </div>
               </div>
             </td>
 
-            <!-- Safety -->
-            <td v-if="user.role === 'admin'">{{ buku.safety }}</td>
+            <td v-if="user.role==='admin'">{{ buku.safety }}</td>
 
-            <!-- Status -->
-            <td v-if="user.role === 'admin'">
+            <td v-if="user.role==='admin'">
               <span class="badge" :class="buku.qty >= buku.safety ? 'bg-success' : 'bg-warning'">
                 {{ buku.qty >= buku.safety ? 'Aman' : 'Menipis' }}
               </span>
@@ -140,15 +130,13 @@
 
             <td class="text-start"><span v-html="buku.catatanHTML"></span></td>
 
-            <!-- ADMIN HAPUS -->
-            <td v-if="user.role === 'admin'">
+            <td v-if="user.role==='admin'">
               <button class="btn btn-danger btn-sm" @click="deleteBook(index)">
                 <i class="bi bi-trash"></i>
               </button>
             </td>
 
-            <!-- USER: TAMBAH KE KERANJANG -->
-            <td v-if="user.role === 'user'">
+            <td v-if="user.role==='user'">
               <button class="btn btn-success btn-sm" @click="addToCart(buku)">
                 <i class="bi bi-cart-plus"></i>
               </button>
@@ -169,26 +157,29 @@ import { dataStok } from "../data/stok.js";
 
 const props = defineProps({ user: Object });
 
-/* ---- LOAD & SAVE ---- */
+/* ====================== LOAD STOK ====================== */
 const loadStok = () => {
   const saved = localStorage.getItem("stokData");
   return saved ? JSON.parse(saved) : dataStok;
 };
-const stok = ref(loadStok());
-const saveStok = () => localStorage.setItem("stokData", JSON.stringify(stok.value));
 
-/* ---- FILTER ---- */
+const stok = ref(loadStok());
+
+const saveStok = () => {
+  localStorage.setItem("stokData", JSON.stringify(stok.value));
+};
+
+/* ====================== FILTER ====================== */
 const filterKategori = ref("");
 const filterUpbjj = ref("");
 const filterRak = ref("");
 const sortBy = ref("");
 
-/* ---- LIST ---- */
 const kategoriList = [...new Set(dataStok.map(s => s.kategori))];
 const upbjjList = [...new Set(dataStok.map(s => s.upbjj))];
 const rakList = [...new Set(dataStok.map(s => s.lokasiRak))];
 
-/* ---- FILTERED ---- */
+/* ====================== FILTERED ====================== */
 const filteredData = computed(() =>
   stok.value.filter(b =>
     (!filterKategori.value || b.kategori === filterKategori.value) &&
@@ -197,9 +188,10 @@ const filteredData = computed(() =>
   )
 );
 
-/* ---- SORT ---- */
+/* ====================== SORT ====================== */
 const sortedData = computed(() => {
   let data = [...filteredData.value];
+
   switch (sortBy.value) {
     case "judul-asc": data.sort((a, b) => a.judul.localeCompare(b.judul)); break;
     case "judul-desc": data.sort((a, b) => b.judul.localeCompare(a.judul)); break;
@@ -208,38 +200,49 @@ const sortedData = computed(() => {
     case "qty-asc": data.sort((a, b) => a.qty - b.qty); break;
     case "qty-desc": data.sort((a, b) => b.qty - a.qty); break;
   }
+
   return data;
 });
 
-/* ---- ADMIN ---- */
+/* ====================== ADMIN ====================== */
 const showAddForm = ref(false);
 const newBook = ref({
-  kode: "", judul: "", kategori: "", upbjj: "", lokasiRak: "",
-  harga: 0, qty: 0, safety: 0, catatanHTML: ""
+  kode: "", judul: "", kategori: "", upbjj: "",
+  lokasiRak: "", harga: 0, qty: 0, safety: 0, catatanHTML: ""
 });
 
 const addBook = () => {
-  if (!newBook.value.kode || !newBook.value.judul) {
-    alert("Kode dan Judul wajib diisi!");
-    return;
-  }
+  if (!newBook.value.kode || !newBook.value.judul)
+    return alert("Kode dan Judul wajib diisi!");
+
   stok.value.push({ ...newBook.value });
   saveStok();
-  newBook.value = { kode: "", judul: "", kategori: "", upbjj: "", lokasiRak: "", harga: 0, qty: 0, safety: 0, catatanHTML: "" };
+
+  newBook.value = {
+    kode: "", judul: "", kategori: "", upbjj: "",
+    lokasiRak: "", harga: 0, qty: 0, safety: 0, catatanHTML: ""
+  };
+
   showAddForm.value = false;
 };
 
-const deleteBook = index => {
-  if (confirm("Hapus buku ini?")) {
-    stok.value.splice(index, 1);
-    saveStok();
-  }
+const deleteBook = (index) => {
+  if (!confirm("Hapus buku ini?")) return;
+  stok.value.splice(index, 1);
+  saveStok();
 };
 
-const increaseQty = i => { stok.value[i].qty++; saveStok(); };
-const decreaseQty = i => { if (stok.value[i].qty > 0) stok.value[i].qty--; saveStok(); };
+const increaseQty = (i) => {
+  stok.value[i].qty++;
+  saveStok();
+};
 
-/* ---- RESET FILTER ---- */
+const decreaseQty = (i) => {
+  if (stok.value[i].qty > 0) stok.value[i].qty--;
+  saveStok();
+};
+
+/* ====================== RESET FILTER ====================== */
 const resetFilter = () => {
   filterKategori.value = "";
   filterUpbjj.value = "";
@@ -247,11 +250,38 @@ const resetFilter = () => {
   sortBy.value = "";
 };
 
-/* ---- USER: KERANJANG ---- */
-const addToCart = buku => {
+/* ====================== ADD TO CART ====================== */
+const addToCart = (buku) => {
+  if (buku.qty <= 0)
+    return alert("Stok buku habis!");
+
+  // update stok
+  let stokData = JSON.parse(localStorage.getItem("stokData") || "[]");
+  let item = stokData.find(s => s.kode === buku.kode);
+  
+  if (item) item.qty--;
+  localStorage.setItem("stokData", JSON.stringify(stokData));
+  stok.value = stokData;
+
+  // update keranjang
   let cart = JSON.parse(localStorage.getItem("cart") || "[]");
-  cart.push(buku);
+
+  let cartItem = cart.find(c => c.kode === buku.kode);
+
+  if (cartItem) {
+    cartItem.jumlah += 1;
+  } else {
+    cart.push({
+      kode: buku.kode,
+      judul: buku.judul,
+      harga: buku.harga,
+      upbjj: buku.upbjj,
+      jumlah: 1
+    });
+  }
+
   localStorage.setItem("cart", JSON.stringify(cart));
-  alert("Ditambahkan ke keranjang!");
+
+  alert("Buku ditambahkan ke keranjang!");
 };
 </script>
