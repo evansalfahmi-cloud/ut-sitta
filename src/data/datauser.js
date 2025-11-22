@@ -1,3 +1,6 @@
+// ==========================================================
+//  DATA MAHASISWA (ROLE: USER)
+// ==========================================================
 export const dataMahasiswa = [
     {
         nim: "043842206",
@@ -6,7 +9,8 @@ export const dataMahasiswa = [
         upbjj: "Mojokerto",
         jenis_kelamin: "Laki-laki",
         password: "123",
-        email: "043842206@ut.ac.id"
+        email: "043842206@ut.ac.id",
+        role: "user"
     },
     {
         nim: "041117563",
@@ -15,7 +19,8 @@ export const dataMahasiswa = [
         upbjj: "Medan",
         jenis_kelamin: "Perempuan",
         password: "123",
-        email: "041117563@ut.ac.id"
+        email: "041117563@ut.ac.id",
+        role: "user"
     },
     {
         nim: "825302344",
@@ -24,7 +29,8 @@ export const dataMahasiswa = [
         upbjj: "Serang",
         jenis_kelamin: "Perempuan",
         password: "123",
-        email: "825302344@ut.ac.id"
+        email: "825302344@ut.ac.id",
+        role: "user"
     },
     {
         nim: "030061142",
@@ -33,7 +39,8 @@ export const dataMahasiswa = [
         upbjj: "Bandar Lampung",
         jenis_kelamin: "Laki-laki",
         password: "123",
-        email: "030061142@ut.ac.id"
+        email: "030061142@ut.ac.id",
+        role: "user"
     },
     {
         nim: "042143017",
@@ -42,7 +49,8 @@ export const dataMahasiswa = [
         upbjj: "Jakarta",
         jenis_kelamin: "Laki-laki",
         password: "123",
-        email: "042143017@ut.ac.id"
+        email: "042143017@ut.ac.id",
+        role: "user"
     },
     {
         nim: "045091234",
@@ -51,7 +59,8 @@ export const dataMahasiswa = [
         upbjj: "Surabaya",
         jenis_kelamin: "Perempuan",
         password: "123",
-        email: "045091234@ut.ac.id"
+        email: "045091234@ut.ac.id",
+        role: "user"
     },
     {
         nim: "046125478",
@@ -60,7 +69,8 @@ export const dataMahasiswa = [
         upbjj: "Malang",
         jenis_kelamin: "Laki-laki",
         password: "123",
-        email: "046125478@ut.ac.id"
+        email: "046125478@ut.ac.id",
+        role: "user"
     },
     {
         nim: "047239876",
@@ -69,7 +79,8 @@ export const dataMahasiswa = [
         upbjj: "Semarang",
         jenis_kelamin: "Perempuan",
         password: "123",
-        email: "047239876@ut.ac.id"
+        email: "047239876@ut.ac.id",
+        role: "user"
     },
     {
         nim: "048340123",
@@ -78,7 +89,8 @@ export const dataMahasiswa = [
         upbjj: "Yogyakarta",
         jenis_kelamin: "Laki-laki",
         password: "123",
-        email: "048340123@ut.ac.id"
+        email: "048340123@ut.ac.id",
+        role: "user"
     },
     {
         nim: "049451678",
@@ -87,7 +99,8 @@ export const dataMahasiswa = [
         upbjj: "Purwokerto",
         jenis_kelamin: "Perempuan",
         password: "123",
-        email: "049451678@ut.ac.id"
+        email: "049451678@ut.ac.id",
+        role: "user"
     },
     {
         nim: "050562901",
@@ -96,7 +109,8 @@ export const dataMahasiswa = [
         upbjj: "Solo",
         jenis_kelamin: "Laki-laki",
         password: "123",
-        email: "050562901@ut.ac.id"
+        email: "050562901@ut.ac.id",
+        role: "user"
     },
     {
         nim: "051673002",
@@ -105,7 +119,8 @@ export const dataMahasiswa = [
         upbjj: "Palembang",
         jenis_kelamin: "Perempuan",
         password: "123",
-        email: "051673002@ut.ac.id"
+        email: "051673002@ut.ac.id",
+        role: "user"
     },
     {
         nim: "052784303",
@@ -114,7 +129,8 @@ export const dataMahasiswa = [
         upbjj: "Pekanbaru",
         jenis_kelamin: "Laki-laki",
         password: "123",
-        email: "052784303@ut.ac.id"
+        email: "052784303@ut.ac.id",
+        role: "user"
     },
     {
         nim: "053895404",
@@ -123,7 +139,8 @@ export const dataMahasiswa = [
         upbjj: "Padang",
         jenis_kelamin: "Perempuan",
         password: "123",
-        email: "053895404@ut.ac.id"
+        email: "053895404@ut.ac.id",
+        role: "user"
     },
     {
         nim: "054906505",
@@ -132,6 +149,55 @@ export const dataMahasiswa = [
         upbjj: "Makassar",
         jenis_kelamin: "Laki-laki",
         password: "123",
-        email: "054906505@ut.ac.id"
+        email: "054906505@ut.ac.id",
+        role: "user"
+    }
+];
+
+
+
+// ==========================================================
+//  DATA ADMIN (ROLE: ADMIN) — 5 AKUN ADMIN
+// ==========================================================
+export const adminUsers = [
+    {
+        nim: "admin1",
+        nama: "Evans Al Fahmi",
+        jenis_kelamin: "Laki-laki",
+        password: "123",
+        email: "admin1@sitta.id",
+        role: "admin"
+    },
+    {
+        nim: "admin2",
+        nama: "Siti Rahmawati",
+        jenis_kelamin: "Perempuan",
+        password: "123",
+        email: "admin2@sitta.id",
+        role: "admin"
+    },
+    {
+        nim: "admin3",
+        nama: "Budi Santoso",
+        jenis_kelamin: "Laki-laki",
+        password: "123",
+        email: "admin3@sitta.id",
+        role: "admin"
+    },
+    {
+        nim: "admin4",
+        nama: "Nur Aisyah Putri",
+        jenis_kelamin: "Perempuan",
+        password: "123",
+        email: "admin4@sitta.id",
+        role: "admin"
+    },
+    {
+        nim: "admin5",
+        nama: "Rizky Pratama",
+        jenis_kelamin: "Laki-laki",
+        password: "123",
+        email: "admin5@sitta.id",
+        role: "admin"
     }
 ];

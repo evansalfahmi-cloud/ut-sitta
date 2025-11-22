@@ -6,18 +6,18 @@
       <img :src="logoUT" alt="UT Logo" style="height: 65px;" />
     </div>
 
-    <!-- Judul Login -->
     <h4 class="fw-bold mb-4">Login SITTA UT</h4>
     
     <form @submit.prevent="login">
+
       <!-- Username -->
       <div class="mb-3 text-start">
-        <label class="form-label">NIM</label>
+        <label class="form-label">NIM / Username</label>
         <input 
           type="text" 
           v-model="username" 
           class="form-control"
-          placeholder="Masukkan NIM"
+          placeholder="Masukkan NIM atau username admin"
           required
         >
       </div>
@@ -40,7 +40,6 @@
         ></i>
       </div>
 
-      <!-- Button -->
       <button 
         type="submit" 
         class="btn btn-warning w-100 fw-semibold py-2"
@@ -65,16 +64,18 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import logoUT from '../img/ut.svg'
-import { dataMahasiswa } from '../data/datauser.js'
 
-const username = ref('')
-const password = ref('')
+
+<script setup>
+import { ref } from "vue"
+import logoUT from "../img/ut.svg"
+import { dataMahasiswa, adminUsers } from "../data/datauser.js"
+
+const username = ref("")
+const password = ref("")
 const showPassword = ref(false)
 const loading = ref(false)
-const error = ref('')
+const error = ref("")
 const showSuccess = ref(false)
 
 const togglePassword = () => {
@@ -82,32 +83,41 @@ const togglePassword = () => {
 }
 
 const login = () => {
-  error.value = ''
+  error.value = ""
   loading.value = true
 
   setTimeout(() => {
     loading.value = false
-    
-    // Cari user berdasarkan NIM
-    const user = dataMahasiswa.find(m => m.nim === username.value)
 
+    let user = null
+
+    // Cari mahasiswa
+    user = dataMahasiswa.find(m => m.nim === username.value)
+
+    // Jika belum ditemukan → cek admin
     if (!user) {
-      error.value = "NIM tidak ditemukan!"
+      user = adminUsers.find(a => a.nim === username.value)
+    }
+
+    // Jika tetap tidak ketemu
+    if (!user) {
+      error.value = "User tidak ditemukan!"
       return
     }
 
+    // Cek password
     if (password.value !== user.password) {
       error.value = "Password salah!"
       return
     }
 
-    // Simpan user
+    // Simpan user ke localStorage
     localStorage.setItem("userLogin", JSON.stringify(user))
 
-    // 🎉 MUNCULKAN POPUP BERHASIL
+    // Tampilkan popup berhasil
     showSuccess.value = true
 
-    // Tunggu 1.5 detik → redirect
+    // Redirect aman (App.vue yang akan menampilkan Dashboard)
     setTimeout(() => {
       window.location.href = "/"
     }, 1500)
@@ -116,8 +126,9 @@ const login = () => {
 }
 </script>
 
+
+
 <style scoped>
-/* POPUP FULLSCREEN */
 .success-popup {
   position: fixed;
   top: 0;
@@ -132,7 +143,6 @@ const login = () => {
   z-index: 9999;
 }
 
-/* KOTAK POPUP */
 .popup-box {
   background: white;
   padding: 30px;
@@ -142,7 +152,6 @@ const login = () => {
   animation: zoomIn 0.3s ease-in-out;
 }
 
-/* ANIMASI */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

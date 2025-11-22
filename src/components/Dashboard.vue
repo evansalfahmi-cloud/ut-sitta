@@ -9,50 +9,64 @@
       @logout="logout"
     />
 
-    <!-- CONTENT WRAPPER -->
+    <!-- CONTENT -->
     <div class="container py-5">
 
       <!-- HOME -->
       <div v-if="currentPage === 'home'">
         <div class="card shadow p-4 mx-auto content-card">
 
-          <h3 class="text-center fw-bold mb-4">Dashboard Mahasiswa</h3>
+          <h3 class="text-center fw-bold mb-3">Dashboard Mahasiswa</h3>
 
-          <!-- === TABEL DATA MAHASISWA === -->
+          <!-- AVATAR -->
+          <div class="text-center mb-4">
+            <img 
+              :src="user.jenis_kelamin === 'Laki-laki' ? avatarLaki : avatarPerempuan"
+              alt="Avatar"
+              class="shadow"
+              style="
+                width: 90px;
+                height: 120px;
+                object-fit: cover;
+                border-radius: 8px;
+              "
+            >
+          </div>
+
+          <!-- TABEL -->
           <table class="table table-bordered table-striped">
             <tbody>
               <tr>
-                <th class="fw-bold" width="40%">Nama</th>
+                <th width="40%">Nama</th>
                 <td>{{ user.nama }}</td>
               </tr>
 
               <tr>
-                <th class="fw-bold">NIM</th>
+                <th>NIM</th>
                 <td>{{ user.nim }}</td>
               </tr>
 
               <tr>
-                <th class="fw-bold">Program Studi</th>
+                <th>Program Studi</th>
                 <td>{{ user.prodi }}</td>
               </tr>
 
               <tr>
-                <th class="fw-bold">UPBJJ</th>
+                <th>UPBJJ</th>
                 <td>{{ user.upbjj }}</td>
               </tr>
 
               <tr>
-                <th class="fw-bold">Jenis Kelamin</th>
+                <th>Jenis Kelamin</th>
                 <td>{{ user.jenis_kelamin }}</td>
               </tr>
 
               <tr>
-                <th class="fw-bold">Email</th>
+                <th>Email</th>
                 <td>{{ user.email }}</td>
               </tr>
             </tbody>
           </table>
-          <!-- === END TABEL === -->
 
           <button class="btn btn-danger w-100 fw-semibold mt-3" @click="logout">
             Logout
@@ -87,7 +101,6 @@
 
     </div>
 
-    <!-- FOOTER -->
     <Footer class="mt-auto" />
 
   </div>
@@ -97,6 +110,10 @@
 import { ref, onMounted } from 'vue'
 import Navbar from './Navbar.vue'
 import Footer from './Footer.vue'
+
+// avatar
+import avatarLaki from '../img/lakilaki.png'
+import avatarPerempuan from '../img/perempuan.png'
 
 const user = ref(null)
 const currentPage = ref('home')
@@ -124,7 +141,6 @@ const logout = () => {
 .dashboard-wrapper {
   background: white;
   min-height: 100vh;
-
   display: flex;
   flex-direction: column;
 }

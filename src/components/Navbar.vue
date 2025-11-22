@@ -2,19 +2,13 @@
   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #083b71;">
     <div class="container-fluid">
 
-      <!-- Brand Logo -->
-      <a class="navbar-brand d-flex align-items-center" href="#">
-        <img 
-          :src="logoUT" 
-          alt="UT Logo" 
-          style="height: 34px; margin-right: 8px;"
-        >
-        <span class="fw-bold d-none d-sm-inline" style="font-size: 16px;">
-          Universitas Terbuka
-        </span>
+      <!-- Brand (Logo UT) -->
+      <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
+        <img :src="logoUT" alt="logo" height="34" class="me-2">
+        SITTA UT
       </a>
 
-      <!-- Toggle Button Mobile -->
+      <!-- Toggle Mobile -->
       <button 
         class="navbar-toggler"
         type="button"
@@ -29,29 +23,35 @@
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
           <li class="nav-item">
-            <a class="nav-link" :class="{ active: currentPage === 'home' }" @click="$emit('changePage', 'home')" href="javascript:void(0)">Home</a>
+            <a class="nav-link" :class="{ active: currentPage === 'home' }"
+               @click="$emit('changePage','home')" href="#">Home</a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" :class="{ active: currentPage === 'stok' }" @click="$emit('changePage', 'stok')" href="javascript:void(0)">Stok</a>
+            <a class="nav-link" :class="{ active: currentPage === 'stok' }"
+               @click="$emit('changePage','stok')" href="#">Stok</a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" :class="{ active: currentPage === 'tracking' }" @click="$emit('changePage', 'tracking')" href="javascript:void(0)">Tracking</a>
+            <a class="nav-link" :class="{ active: currentPage === 'tracking' }"
+               @click="$emit('changePage','tracking')" href="#">Tracking</a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" :class="{ active: currentPage === 'keranjang' }" @click="$emit('changePage', 'keranjang')" href="javascript:void(0)">Keranjang</a>
+            <a class="nav-link" :class="{ active: currentPage === 'keranjang' }"
+               @click="$emit('changePage','keranjang')" href="#">Keranjang</a>
           </li>
 
         </ul>
 
-        <!-- Welcome -->
-        <span class="navbar-text text-white me-3">
-          Halo, {{ user.nama.split(' ')[0] }}
+        <!-- NAMA USER + ROLE -->
+        <span class="navbar-text text-white me-3 fw-semibold">
+          {{ user.nama.split(" ")[0] }}
+          <span v-if="user.role === 'admin'" class="badge bg-warning text-dark ms-2">
+            Admin
+          </span>
         </span>
 
-        <!-- Logout -->
         <button class="btn btn-outline-light btn-sm" @click="$emit('logout')">
           Logout
         </button>
@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-import logoUT from '../img/ut-white.svg'
+import logoUT from '../img/ut.svg'
 
 defineProps({
   user: Object,
