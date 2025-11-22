@@ -4,26 +4,25 @@ import { ref, computed, onMounted } from "vue";
 import LoginForm from "./components/LoginForm.vue";
 import Navbar from "./components/Navbar.vue";
 
-/* GANTI Home.vue MENJADI Dashboard.vue */
 import Dashboard from "./components/Dashboard.vue";
 import Stok from "./components/Stok.vue";
 import Tracking from "./components/Tracking.vue";
 import Keranjang from "./components/Keranjang.vue";
 
-/* ========================== LOGIN ========================== */
+/* LOGIN */
 const isLoggedIn = ref(false);
 const userData = ref(null);
 
 onMounted(() => {
-  let saved = localStorage.getItem("userLogin");
+  const saved = localStorage.getItem("userLogin");
   if (saved) {
     isLoggedIn.value = true;
     userData.value = JSON.parse(saved);
   }
 });
 
-/* ========================== PAGE NAVIGATION ========================== */
-const currentPage = ref("home");
+/* NAVIGASI */
+const currentPage = ref("dashboard");
 
 const changePage = (page) => {
   currentPage.value = page;
@@ -33,20 +32,16 @@ const logoutUser = () => {
   localStorage.removeItem("userLogin");
   isLoggedIn.value = false;
   userData.value = null;
-  currentPage.value = "home";
+  currentPage.value = "dashboard";
 };
 
-/* ========================== PAGE COMPONENT LOADER ========================== */
+/* HALAMAN DINAMIS */
 const currentPageComponent = computed(() => {
   switch (currentPage.value) {
-
-    /* dashboard sebagai halaman HOME */
-    case "home": return Dashboard;
-
+    case "dashboard": return Dashboard;
     case "stok": return Stok;
     case "tracking": return Tracking;
     case "keranjang": return Keranjang;
-
     default: return Dashboard;
   }
 });
@@ -55,15 +50,13 @@ const currentPageComponent = computed(() => {
 <template>
   <div>
 
-    <!-- LOGIN PAGE -->
-    <div
-      v-if="!isLoggedIn"
-      class="d-flex justify-content-center align-items-center vh-100 bg-light"
-    >
+    <!-- LOGIN -->
+    <div v-if="!isLoggedIn"
+      class="d-flex justify-content-center align-items-center vh-100 bg-light">
       <LoginForm />
     </div>
 
-    <!-- MAIN DASHBOARD -->
+    <!-- HALAMAN UTAMA -->
     <div v-else>
 
       <!-- NAVBAR -->
@@ -74,18 +67,12 @@ const currentPageComponent = computed(() => {
         @logout="logoutUser"
       />
 
-      <!-- PAGE CONTENT -->
+      <!-- HALAMAN DINAMIS -->
       <div class="mt-5 pt-4 container-fluid">
-        <component :is="currentPageComponent" :user="userData"></component>
+        <component :is="currentPageComponent" :user="userData" />
       </div>
 
     </div>
 
   </div>
 </template>
-
-<style scoped>
-body {
-  margin: 0;
-}
-</style>

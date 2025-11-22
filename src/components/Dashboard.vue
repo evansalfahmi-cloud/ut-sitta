@@ -12,7 +12,7 @@
     <!-- CONTENT -->
     <div class="container dashboard-content">
 
-      <!-- HOME -->
+      <!-- HOME / DASHBOARD -->
       <div v-if="currentPage === 'home'">
         <div class="card shadow p-4 mx-auto content-card">
 
@@ -53,18 +53,12 @@
 
       <!-- TRACKING -->
       <div v-if="currentPage === 'tracking'">
-        <h3 class="fw-bold mb-3">Tracking DO</h3>
-        <div class="card p-4 shadow content-card">
-          <p>Halaman tracking masih kosong.</p>
-        </div>
+        <Tracking :user="user" />
       </div>
 
       <!-- KERANJANG -->
       <div v-if="currentPage === 'keranjang'">
-        <h3 class="fw-bold mb-3">Keranjang</h3>
-        <div class="card p-4 shadow content-card">
-          <p>Halaman keranjang masih kosong.</p>
-        </div>
+        <Keranjang :user="user" />
       </div>
 
     </div>
@@ -77,11 +71,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+
 import Navbar from './Navbar.vue'
 import Footer from './Footer.vue'
-import Stok from './Stok.vue'   // ← MENAMBAHKAN INI
 
-// Avatar
+import Stok from './Stok.vue'
+import Tracking from './Tracking.vue'
+import Keranjang from './Keranjang.vue'
+
 import avatarLaki from '../img/lakilaki.png'
 import avatarPerempuan from '../img/perempuan.png'
 
@@ -112,7 +109,6 @@ const logout = () => {
   flex-direction: column;
 }
 
-/* Konten tidak tertutup navbar */
 .dashboard-content {
   padding-top: 90px;
 }

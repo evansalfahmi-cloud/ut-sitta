@@ -3,12 +3,12 @@
 
     <h3 class="fw-bold mb-4">Keranjang Buku</h3>
 
-    <!-- Jika kosong -->
+    <!-- Jika keranjang kosong -->
     <div v-if="cart.length === 0" class="alert alert-info text-center">
       Keranjang masih kosong.
     </div>
 
-    <!-- Jika ada isi -->
+    <!-- Jika ada isi keranjang -->
     <div v-else class="card p-3 shadow">
 
       <table class="table table-striped align-middle">
@@ -68,9 +68,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watchEffect } from "vue";
+import { ref, computed, onMounted } from "vue";
 
-/* ================= CART ================= */
+/* =======================================================
+   LOAD CART
+======================================================= */
 const cart = ref([]);
 
 const loadCart = () => {
@@ -81,28 +83,27 @@ const saveCart = () => {
   localStorage.setItem("cart", JSON.stringify(cart.value));
 };
 
-/* Auto load setiap kali localStorage berubah */
-watchEffect(() => {
-  loadCart();
-});
+/* =======================================================
+   LOAD & SAVE STOK
+======================================================= */
+const loadStok = () =>
+  JSON.parse(localStorage.getItem("stokData") || "[]");
 
-/* ================= STOK ================= */
-const loadStok = () => JSON.parse(localStorage.getItem("stokData") || "[]");
+const saveStok = (data) =>
+  localStorage.setItem("stokData", JSON.stringify(data));
 
-const saveStok = (stok) => {
-  localStorage.setItem("stokData", JSON.stringify(stok));
-};
-
-/* ================= REMOVE ITEM ================= */
+/* =======================================================
+   REMOVE ITEM
+======================================================= */
 const removeFromCart = (index) => {
   const buku = cart.value[index];
 
-  // Kembalikan stok sebanyak jumlahnya
+  // Tambahkan kembali ke stok
   let stok = loadStok();
-  let item = stok.find(s => s.kode === buku.kode);
+  let item = stok.find((s) => s.kode === buku.kode);
 
   if (item) {
-    item.qty = Number(item.qty) + Number(buku.jumlah);
+    item.qty += buku.jumlah;
     saveStok(stok);
   }
 
@@ -111,7 +112,9 @@ const removeFromCart = (index) => {
   saveCart();
 };
 
-/* ================= TOTAL ================= */
+/* =======================================================
+   TOTAL HARGA
+======================================================= */
 const totalHarga = computed(() =>
   cart.value.reduce(
     (sum, item) => sum + Number(item.harga) * Number(item.jumlah),
@@ -119,36 +122,34 @@ const totalHarga = computed(() =>
   )
 );
 
-/* ================= CHECKOUT ================= */
+/* =======================================================
+   CHECKOUT
+======================================================= */
 const checkoutSuccess = ref(false);
 
 const checkout = () => {
   if (cart.value.length === 0)
     return alert("Keranjang kosong!");
 
-  // Keranjang dikosongkan, stok tidak berubah
   cart.value = [];
   saveCart();
 
   checkoutSuccess.value = true;
 };
 
-const closePopup = () => {
-  checkoutSuccess.value = false;
-};
+const closePopup = () => (checkoutSuccess.value = false);
 
 onMounted(loadCart);
 </script>
 
 <style scoped>
-/* Popup */
 .popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
