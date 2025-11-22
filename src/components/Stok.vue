@@ -1,5 +1,4 @@
 <template>
-  <!-- Gunakan container-fluid agar lebar penuh -->
   <div class="card shadow p-4 container-fluid">
 
     <h3 class="fw-bold mb-3">Stok Bahan Ajar</h3>
@@ -54,7 +53,7 @@
       </div>
     </div>
 
-    <!-- TABEL BUKU (Responsive) -->
+    <!-- TABEL RESPONSIVE -->
     <div class="table-responsive">
       <table class="table table-bordered table-striped align-middle text-center">
         <thead class="table-dark">
@@ -66,6 +65,7 @@
             <th>Harga</th>
             <th>Qty</th>
             <th>Safety</th>
+            <th>Status</th>
             <th>Catatan</th>
             <th v-if="user.role === 'admin'">Aksi</th>
           </tr>
@@ -79,11 +79,11 @@
             <td>{{ buku.lokasiRak }}</td>
             <td>Rp {{ buku.harga.toLocaleString() }}</td>
 
+            <!-- Qty -->
             <td>
               <div class="d-flex flex-column align-items-center">
                 <span class="fw-bold">{{ buku.qty }}</span>
 
-                <!-- ADMIN BUTTON -->
                 <div v-if="user.role === 'admin'" class="btn-group mt-1">
                   <button class="btn btn-sm btn-success" @click="buku.qty++">+</button>
                   <button class="btn btn-sm btn-warning" @click="buku.qty > 0 ? buku.qty-- : null">-</button>
@@ -93,10 +93,22 @@
 
             <td>{{ buku.safety }}</td>
 
+            <!-- STATUS -->
+            <td>
+              <span 
+                class="badge"
+                :class="buku.qty >= buku.safety ? 'bg-success' : 'bg-danger'"
+              >
+                {{ buku.qty >= buku.safety ? 'Aman' : 'Menipis' }}
+              </span>
+            </td>
+
+            <!-- Catatan -->
             <td class="text-start">
               <span v-html="buku.catatanHTML"></span>
             </td>
 
+            <!-- Delete -->
             <td v-if="user.role === 'admin'">
               <button class="btn btn-danger btn-sm" @click="deleteBook(index)">
                 <i class="bi bi-trash"></i>
@@ -164,5 +176,5 @@ const deleteBook = (index) => {
 </script>
 
 <style scoped>
-/* HAPUS CONTENT-CARD AGAR FULL WIDTH */
+/* Tidak ada styling tambahan sesuai permintaan */
 </style>
