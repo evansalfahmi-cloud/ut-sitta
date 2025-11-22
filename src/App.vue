@@ -1,15 +1,16 @@
-<script setup>
-import LoginForm from './components/LoginForm.vue'
-</script>
-
 <template>
-  <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
-    <LoginForm />
-  </div>
+  <LoginForm v-if="!isLoggedIn" />
+  <Dashboard v-else />
 </template>
 
-<style scoped>
-body {
-  margin: 0;
+<script setup>
+import { ref } from 'vue'
+import LoginForm from './components/LoginForm.vue'
+import Dashboard from './components/Dashboard.vue'
+
+const isLoggedIn = ref(false)
+
+if (localStorage.getItem("userLogin")) {
+  isLoggedIn.value = true
 }
-</style>
+</script>

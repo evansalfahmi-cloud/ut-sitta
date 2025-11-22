@@ -63,7 +63,7 @@
 <script setup>
 import { ref } from 'vue'
 import logoUT from '../img/ut.svg'
-import { dataMahasiswa } from '../data/datauser.js'   // Import data mahasiswa
+import { dataMahasiswa } from '../data/datauser.js'
 
 const username = ref('')
 const password = ref('')
@@ -96,15 +96,12 @@ const login = () => {
       return
     }
 
-    // LOGIN BERHASIL
-    alert(`Selamat datang, ${user.nama}!`)
-    
-    // Simpan user ke localStorage (opsional)
+    // LOGIN BERHASIL → Simpan data user
     localStorage.setItem("userLogin", JSON.stringify(user))
 
-    // Bisa redirect ke dashboard nanti
-    // window.location.href = "/dashboard"
-    
+    // Redirect ke App.vue
+    window.location.href = "/"
+
   }, 1200)
 }
 </script>
