@@ -1,5 +1,5 @@
 <template>
-  <div class="card shadow p-4 container-fluid">
+  <div class="card shadow p-4 container">
 
     <h3 class="fw-bold mb-3">Stok Bahan Ajar</h3>
 

@@ -1,5 +1,5 @@
 <template>
-  <footer class="text-center py-3 mt-4" style="font-size: 14px;">
+  <footer class="text-center py-3 mt-1" style="font-size: 14px;">
     Evans Al Fahmi - (049315444). Sistem Informasi - Universitas Terbuka
   </footer>
 </template>

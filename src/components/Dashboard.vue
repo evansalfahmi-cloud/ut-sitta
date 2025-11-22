@@ -61,7 +61,7 @@
 
     </div>
 
-    <Footer class="mt-auto" />
+    <Footer />
   </div>
 </template>
 
@@ -104,7 +104,6 @@ const logout = () => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding-top: 40px;
 }
 
 .dashboard-content {

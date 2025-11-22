@@ -73,7 +73,7 @@ defineProps({
 <style scoped>
 .custom-navbar {
   background-color: #083b71;
-  height: 54px;
+  height: 48px;
   padding-top: 4px;
   padding-bottom: 4px;
   box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
@@ -87,7 +87,5 @@ defineProps({
 }
 
 /* Global spacing agar konten tidak menabrak navbar */
-:global(body) {
-  padding-top: 70px !important; /* FIX PREFEK */
-}
+
 </style>

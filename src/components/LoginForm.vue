@@ -17,7 +17,7 @@
           type="text" 
           v-model="username" 
           class="form-control"
-          placeholder="Masukkan NIM atau username admin"
+          placeholder="Masukkan NIM atau Admin"
           required
         >
       </div>
