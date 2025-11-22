@@ -3,13 +3,13 @@
 
     <h3 class="fw-bold mb-3">Tracking Pengiriman</h3>
 
-    <div v-if="tracking.length === 0" class="alert alert-info text-center">
-      Belum ada transaksi atau pengiriman.
+    <div v-if="filteredTracking.length === 0" class="alert alert-info text-center">
+      Belum ada transaksi atau pengiriman yang bisa ditampilkan.
     </div>
 
     <div v-else>
       <div
-        v-for="(data, index) in tracking"
+        v-for="(data, index) in filteredTracking"
         :key="index"
         class="card shadow p-3 mb-4"
       >
@@ -23,7 +23,8 @@
           <strong>Kurir:</strong>
           {{ data.kurir }} - Ongkir Rp {{ data.ongkir.toLocaleString() }}
         </p>
-        <p class="mb-3"><strong>Total Bayar:</strong>
+        <p class="mb-3">
+          <strong>Total Bayar:</strong>
           Rp {{ data.totalBayar.toLocaleString() }}
         </p>
 
@@ -67,13 +68,38 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 
 const tracking = ref([]);
+const user = ref(null);
 
+/* LOAD TRACKING */
 const loadTracking = () => {
   tracking.value = JSON.parse(localStorage.getItem("tracking") || "[]");
 };
 
-onMounted(loadTracking);
+/* LOAD USER LOGIN */
+const loadUser = () => {
+  user.value = JSON.parse(localStorage.getItem("userLogin") || "{}");
+};
+
+/* FILTERING:
+   - Admin: semua data tracking
+   - User biasa: hanya tracking miliknya
+*/
+const filteredTracking = computed(() => {
+  if (!user.value) return [];
+
+  if (user.value.role === "admin") {
+    return tracking.value;
+  }
+
+  // user biasa → hanya data miliknya
+  return tracking.value.filter((t) => t.user.nim === user.value.nim);
+});
+
+onMounted(() => {
+  loadUser();
+  loadTracking();
+});
 </script>
