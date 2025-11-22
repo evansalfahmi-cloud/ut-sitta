@@ -107,7 +107,7 @@ const logout = () => {
 }
 
 .dashboard-content {
-  padding-top: 100px; /* navbar fix */
+  padding-top: 80px; /* navbar fix */
   padding-bottom: 40px;
 }
 

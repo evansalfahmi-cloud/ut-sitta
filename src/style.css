@@ -1,4 +1,6 @@
-/* === IMPORT SF PRO DISPLAY === */
+/* =============================
+   IMPORT SF PRO DISPLAY
+============================= */
 @font-face {
   font-family: 'SF Pro Display';
   src: url('./assets/fonts/SF-Pro-Display-Regular.otf') format('opentype');
@@ -23,44 +25,51 @@
   font-display: swap;
 }
 
-/* === PAKSA SEMUA ELEMEN MENGGUNAKAN SF PRO DISPLAY === */
-html, body, #app, * {
+/* =============================
+   GLOBAL FONT
+============================= */
+body, input, button, select, textarea, label {
   font-family: 'SF Pro Display', sans-serif !important;
 }
 
-/* === FIX: hilangkan background putih bawaan Vite === */
-html, body, #app {
+/* =============================
+   RESET & BASE
+============================= */
+html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
-  background-color: #083b71 !important; /* warna biru full layar */
+  min-height: 100vh;
+  background-color: #ffffff !important;  /* Putih bersih */
 }
 
-/* RESET DEFAULT */
+/* Hilangkan styling bawaan Vite */
+#app {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ffffff !important;
+}
+
+/* =============================
+   GENERIC FIXES
+============================= */
 a {
   text-decoration: none;
   color: inherit;
 }
 
-/* Heading tetap tebal */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600 !important;
 }
 
-/* Input, label, button pakai SF Pro */
-input, button, select, textarea, label {
-  font-family: 'SF Pro Display', sans-serif !important;
-}
-
-/* Hilangkan padding bawaan template Vite */
-#app {
-  padding: 0;
-  max-width: none;
-  text-align: left;
-}
-
-/* Card biarkan default Bootstrap */
+/* Card default bootstrap */
 .card {
   border-radius: 16px;
+}
+
+/* Tabel teks rata tengah default */
+table {
+  font-size: 14px;
 }
