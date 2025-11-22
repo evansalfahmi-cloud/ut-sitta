@@ -1,11 +1,11 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #083b71;">
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top custom-navbar">
     <div class="container-fluid">
 
-      <!-- Brand (Logo UT) -->
-      <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
-        <img :src="logoUT" alt="logo" height="34" class="me-2">
-        SITTA UT
+      <!-- Logo UT + Brand -->
+      <a class="navbar-brand fw-medium d-flex align-items-center" href="#">
+        <img :src="logoUT" alt="logo" height="30" class="me-2">
+        Universitas Terbuka
       </a>
 
       <!-- Toggle Mobile -->
@@ -20,7 +20,7 @@
 
       <!-- Menu -->
       <div class="collapse navbar-collapse" id="navMenu">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 small">
 
           <li class="nav-item">
             <a class="nav-link" :class="{ active: currentPage === 'home' }"
@@ -44,10 +44,10 @@
 
         </ul>
 
-        <!-- NAMA USER + ROLE -->
-        <span class="navbar-text text-white me-3 fw-semibold">
+        <!-- USER + ROLE -->
+        <span class="navbar-text text-white me-3 fw-semibold small">
           {{ user.nama.split(" ")[0] }}
-          <span v-if="user.role === 'admin'" class="badge bg-warning text-dark ms-2">
+          <span v-if="user.role === 'admin'" class="badge bg-warning text-dark ms-1">
             Admin
           </span>
         </span>
@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-import logoUT from '../img/ut.svg'
+import logoUT from '../img/ut-white.svg'
 
 defineProps({
   user: Object,
@@ -71,8 +71,25 @@ defineProps({
 </script>
 
 <style scoped>
+/* Navbar lebih tipis */
+.custom-navbar {
+  background-color: #083b71;
+  height: 54px;                /* tinggi navbar diperkecil */
+  padding-top: 4px;
+  padding-bottom: 4px;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Link aktif warna kuning */
 .nav-link.active {
   font-weight: bold;
   color: #ffc107 !important;
+}
+
+/* Font menu lebih kecil */
+.nav-link {
+  font-size: 14px;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
 }
 </style>

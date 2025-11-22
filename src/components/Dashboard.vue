@@ -10,7 +10,7 @@
     />
 
     <!-- CONTENT -->
-    <div class="container py-5">
+    <div class="container dashboard-content">
 
       <!-- HOME -->
       <div v-if="currentPage === 'home'">
@@ -23,48 +23,19 @@
             <img 
               :src="user.jenis_kelamin === 'Laki-laki' ? avatarLaki : avatarPerempuan"
               alt="Avatar"
-              class="shadow"
-              style="
-                width: 90px;
-                height: 120px;
-                object-fit: cover;
-                border-radius: 8px;
-              "
+              class="avatar-img shadow"
             >
           </div>
 
-          <!-- TABEL -->
+          <!-- TABEL BIODATA -->
           <table class="table table-bordered table-striped">
             <tbody>
-              <tr>
-                <th width="40%">Nama</th>
-                <td>{{ user.nama }}</td>
-              </tr>
-
-              <tr>
-                <th>NIM</th>
-                <td>{{ user.nim }}</td>
-              </tr>
-
-              <tr>
-                <th>Program Studi</th>
-                <td>{{ user.prodi }}</td>
-              </tr>
-
-              <tr>
-                <th>UPBJJ</th>
-                <td>{{ user.upbjj }}</td>
-              </tr>
-
-              <tr>
-                <th>Jenis Kelamin</th>
-                <td>{{ user.jenis_kelamin }}</td>
-              </tr>
-
-              <tr>
-                <th>Email</th>
-                <td>{{ user.email }}</td>
-              </tr>
+              <tr><th width="40%">Nama</th><td>{{ user.nama }}</td></tr>
+              <tr><th>NIM</th><td>{{ user.nim }}</td></tr>
+              <tr><th>Program Studi</th><td>{{ user.prodi }}</td></tr>
+              <tr><th>UPBJJ</th><td>{{ user.upbjj }}</td></tr>
+              <tr><th>Jenis Kelamin</th><td>{{ user.jenis_kelamin }}</td></tr>
+              <tr><th>Email</th><td>{{ user.email }}</td></tr>
             </tbody>
           </table>
 
@@ -77,10 +48,7 @@
 
       <!-- STOK -->
       <div v-if="currentPage === 'stok'">
-        <h3 class="fw-bold mb-3">Stok Bahan Ajar</h3>
-        <div class="card p-4 shadow content-card">
-          <p>Halaman stok masih kosong, siap untuk diisi.</p>
-        </div>
+        <Stok :user="user" />
       </div>
 
       <!-- TRACKING -->
@@ -101,6 +69,7 @@
 
     </div>
 
+    <!-- FOOTER -->
     <Footer class="mt-auto" />
 
   </div>
@@ -110,8 +79,9 @@
 import { ref, onMounted } from 'vue'
 import Navbar from './Navbar.vue'
 import Footer from './Footer.vue'
+import Stok from './Stok.vue'   // ← MENAMBAHKAN INI
 
-// avatar
+// Avatar
 import avatarLaki from '../img/lakilaki.png'
 import avatarPerempuan from '../img/perempuan.png'
 
@@ -120,11 +90,8 @@ const currentPage = ref('home')
 
 onMounted(() => {
   const saved = localStorage.getItem("userLogin")
-  if (!saved) {
-    window.location.href = "/"
-  } else {
-    user.value = JSON.parse(saved)
-  }
+  if (!saved) return window.location.href = "/"
+  user.value = JSON.parse(saved)
 })
 
 const setPage = (page) => {
@@ -145,9 +112,21 @@ const logout = () => {
   flex-direction: column;
 }
 
+/* Konten tidak tertutup navbar */
+.dashboard-content {
+  padding-top: 90px;
+}
+
 .content-card {
   max-width: 600px;
   margin: auto;
   border-radius: 16px;
+}
+
+.avatar-img {
+  width: 90px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
 }
 </style>
