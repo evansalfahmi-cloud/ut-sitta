@@ -18,14 +18,41 @@
 
           <h3 class="text-center fw-bold mb-4">Dashboard Mahasiswa</h3>
 
-          <div v-if="user">
-            <p><strong>Nama:</strong> {{ user.nama }}</p>
-            <p><strong>NIM:</strong> {{ user.nim }}</p>
-            <p><strong>Program Studi:</strong> {{ user.prodi }}</p>
-            <p><strong>UPBJJ:</strong> {{ user.upbjj }}</p>
-            <p><strong>Jenis Kelamin:</strong> {{ user.jenis_kelamin }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-          </div>
+          <!-- === TABEL DATA MAHASISWA === -->
+          <table class="table table-bordered table-striped">
+            <tbody>
+              <tr>
+                <th class="fw-bold" width="40%">Nama</th>
+                <td>{{ user.nama }}</td>
+              </tr>
+
+              <tr>
+                <th class="fw-bold">NIM</th>
+                <td>{{ user.nim }}</td>
+              </tr>
+
+              <tr>
+                <th class="fw-bold">Program Studi</th>
+                <td>{{ user.prodi }}</td>
+              </tr>
+
+              <tr>
+                <th class="fw-bold">UPBJJ</th>
+                <td>{{ user.upbjj }}</td>
+              </tr>
+
+              <tr>
+                <th class="fw-bold">Jenis Kelamin</th>
+                <td>{{ user.jenis_kelamin }}</td>
+              </tr>
+
+              <tr>
+                <th class="fw-bold">Email</th>
+                <td>{{ user.email }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- === END TABEL === -->
 
           <button class="btn btn-danger w-100 fw-semibold mt-3" @click="logout">
             Logout
@@ -98,12 +125,10 @@ const logout = () => {
   background: white;
   min-height: 100vh;
 
-  /* agar footer di bawah */
   display: flex;
   flex-direction: column;
 }
 
-/* Semua card utama punya lebar seragam */
 .content-card {
   max-width: 600px;
   margin: auto;
