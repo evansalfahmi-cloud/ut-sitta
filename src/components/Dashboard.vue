@@ -10,15 +10,14 @@
     />
 
     <!-- CONTENT -->
-    <div class="container dashboard-content">
+    <div class="container dashboard-content" v-if="user">
 
-      <!-- HOME / DASHBOARD -->
+      <!-- HOME -->
       <div v-if="currentPage === 'home'">
         <div class="card shadow p-4 mx-auto content-card">
 
           <h3 class="text-center fw-bold mb-3">Dashboard Mahasiswa</h3>
 
-          <!-- AVATAR -->
           <div class="text-center mb-4">
             <img 
               :src="user.jenis_kelamin === 'Laki-laki' ? avatarLaki : avatarPerempuan"
@@ -27,7 +26,6 @@
             >
           </div>
 
-          <!-- TABEL BIODATA -->
           <table class="table table-bordered table-striped">
             <tbody>
               <tr><th width="40%">Nama</th><td>{{ user.nama }}</td></tr>
@@ -63,9 +61,7 @@
 
     </div>
 
-    <!-- FOOTER -->
     <Footer class="mt-auto" />
-
   </div>
 </template>
 
@@ -88,6 +84,7 @@ const currentPage = ref('home')
 onMounted(() => {
   const saved = localStorage.getItem("userLogin")
   if (!saved) return window.location.href = "/"
+
   user.value = JSON.parse(saved)
 })
 
@@ -110,7 +107,8 @@ const logout = () => {
 }
 
 .dashboard-content {
-  padding-top: 90px;
+  padding-top: 100px; /* navbar fix */
+  padding-bottom: 40px;
 }
 
 .content-card {

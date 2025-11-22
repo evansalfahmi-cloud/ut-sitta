@@ -49,6 +49,35 @@
 
     </div>
 
+    <!-- ADMIN: Tambah Buku -->
+    <div class="mb-3" v-if="user.role === 'admin'">
+      <button class="btn btn-primary btn-sm" @click="showAddForm = !showAddForm">
+        <i class="bi bi-plus-circle"></i> Tambah Buku
+      </button>
+    </div>
+
+    <!-- FORM ADMIN -->
+    <div v-if="showAddForm && user.role === 'admin'" class="card p-3 mb-3">
+      <h5 class="fw-bold mb-3">Tambah Buku Baru</h5>
+
+      <div class="row g-3">
+        <div class="col-md-4"><input v-model="newBook.kode" class="form-control" placeholder="Kode Buku"></div>
+        <div class="col-md-8"><input v-model="newBook.judul" class="form-control" placeholder="Judul Buku"></div>
+        <div class="col-md-4"><input v-model="newBook.kategori" class="form-control" placeholder="Kategori"></div>
+        <div class="col-md-4"><input v-model="newBook.upbjj" class="form-control" placeholder="UPBJJ"></div>
+        <div class="col-md-4"><input v-model="newBook.lokasiRak" class="form-control" placeholder="Lokasi Rak"></div>
+        <div class="col-md-4"><input v-model.number="newBook.harga" type="number" class="form-control" placeholder="Harga"></div>
+        <div class="col-md-4"><input v-model.number="newBook.qty" type="number" class="form-control" placeholder="Qty"></div>
+        <div class="col-md-4"><input v-model.number="newBook.safety" type="number" class="form-control" placeholder="Safety"></div>
+        <div class="col-12"><textarea v-model="newBook.catatanHTML" class="form-control" placeholder="Catatan (HTML)"></textarea></div>
+
+        <div class="col-12 text-end mt-2">
+          <button class="btn btn-secondary btn-sm me-2" @click="showAddForm = false">Batal</button>
+          <button class="btn btn-success btn-sm" @click="addBook">Simpan</button>
+        </div>
+      </div>
+    </div>
+
     <!-- TABEL -->
     <div class="table-responsive">
       <table class="table table-bordered table-striped align-middle text-center">
@@ -61,13 +90,16 @@
             <th>Rak</th>
             <th>Harga</th>
             <th>Qty</th>
+            <th v-if="user.role==='admin'">Safety</th>
+            <th v-if="user.role==='admin'">Status</th>
             <th>Catatan</th>
-            <th v-if="user.role=='user'">Keranjang</th>
+            <th v-if="user.role==='admin'">Aksi</th>
+            <th v-if="user.role==='user'">Keranjang</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr v-for="(buku, index) in sortedData" :key="buku.kode">
+          <tr v-for="buku in sortedData" :key="buku.kode">
 
             <td>{{ buku.kode }}</td>
             <td class="text-start">{{ buku.judul }}</td>
@@ -76,15 +108,40 @@
             <td>Rp {{ buku.harga.toLocaleString() }}</td>
 
             <td>
-              <span class="fw-bold">{{ buku.qty }}</span>
+              <div class="d-flex flex-column align-items-center">
+                <span class="fw-bold">{{ buku.qty }}</span>
+
+                <!-- ADMIN BUTTONS -->
+                <div v-if="user.role==='admin'" class="btn-group mt-1">
+                  <button class="btn btn-sm btn-success" @click="increaseQty(buku.kode)">+</button>
+                  <button class="btn btn-sm btn-warning" @click="decreaseQty(buku.kode)">-</button>
+                </div>
+              </div>
             </td>
 
-            <td class="text-start">
-              <span v-html="buku.catatanHTML"></span>
+            <td v-if="user.role==='admin'">{{ buku.safety }}</td>
+
+            <td v-if="user.role==='admin'">
+              <span class="badge"
+                :class="{
+                  'bg-danger': buku.qty === 0,
+                  'bg-warning': buku.qty > 0 && buku.qty < buku.safety,
+                  'bg-success': buku.qty >= buku.safety
+                }">
+                {{ buku.qty === 0 ? 'Kosong' : buku.qty < buku.safety ? 'Menipis' : 'Aman' }}
+              </span>
             </td>
 
-            <td v-if="user.role=='user'">
-              <button class="btn btn-success btn-sm" @click="addToCart(buku)">
+            <td class="text-start"><span v-html="buku.catatanHTML"></span></td>
+
+            <td v-if="user.role==='admin'">
+              <button class="btn btn-danger btn-sm" @click="deleteBook(buku.kode)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+
+            <td v-if="user.role==='user'">
+              <button class="btn btn-success btn-sm" @click="addToCart(buku.kode)">
                 <i class="bi bi-cart-plus"></i>
               </button>
             </td>
@@ -102,19 +159,12 @@
 import { ref, computed } from "vue";
 import { dataStok } from "../data/stok.js";
 
-const props = defineProps({
-  user: Object
-});
+const props = defineProps({ user: Object });
 
-/* ====================================
-   LOAD DATA STOK
-==================================== */
+/* Load stok */
 const loadStok = () => {
   let saved = localStorage.getItem("stokData");
-  if (saved) return JSON.parse(saved);
-
-  localStorage.setItem("stokData", JSON.stringify(dataStok));
-  return dataStok;
+  return saved ? JSON.parse(saved) : dataStok;
 };
 
 const stok = ref(loadStok());
@@ -122,9 +172,7 @@ const stok = ref(loadStok());
 const saveStok = () =>
   localStorage.setItem("stokData", JSON.stringify(stok.value));
 
-/* ====================================
-   FILTER
-==================================== */
+/* Filters */
 const filterKategori = ref("");
 const filterUpbjj = ref("");
 const filterRak = ref("");
@@ -142,9 +190,7 @@ const filteredData = computed(() =>
   )
 );
 
-/* ====================================
-   SORT
-==================================== */
+/* Sorting */
 const sortedData = computed(() => {
   let data = [...filteredData.value];
 
@@ -160,51 +206,68 @@ const sortedData = computed(() => {
   return data;
 });
 
-/* ====================================
-   RESET FILTER
-==================================== */
-const resetFilter = () => {
-  filterKategori.value = "";
-  filterUpbjj.value = "";
-  filterRak.value = "";
-  sortBy.value = "";
+/* ===============================
+   ADMIN: QTY CONTROL (Fix Index)
+===============================*/
+const increaseQty = (kode) => {
+  let item = stok.value.find(s => s.kode === kode);
+  if (item) {
+    item.qty++;
+    saveStok();
+  }
 };
 
-/* ====================================
-   ADD TO CART (PERBAIKAN BESAR)
-==================================== */
-const addToCart = (buku) => {
-  if (buku.qty <= 0)
+const decreaseQty = (kode) => {
+  let item = stok.value.find(s => s.kode === kode);
+  if (item && item.qty > 0) {
+    item.qty--;
+    saveStok();
+  }
+};
+
+const deleteBook = (kode) => {
+  if (confirm("Hapus buku ini?")) {
+    stok.value = stok.value.filter(x => x.kode !== kode);
+    saveStok();
+  }
+};
+
+/* ===============================
+   USER: ADD TO CART
+===============================*/
+const addToCart = (kode) => {
+  let item = stok.value.find(x => x.kode === kode);
+
+  if (!item || item.qty <= 0)
     return alert("Stok habis!");
 
-  // 🔥 update qty langsung dari stok utama (aman)
-  const item = stok.value.find(s => s.kode === buku.kode);
-  if (item) {
-    item.qty -= 1;
-  }
-
-  // simpan stok terbaru
+  item.qty--;
   saveStok();
 
-  // ambil cart dari localStorage
   let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  let c = cart.find(x => x.kode === kode);
 
-  let cartItem = cart.find(c => c.kode === buku.kode);
-
-  if (cartItem) {
-    cartItem.jumlah += 1;
+  if (c) {
+    c.jumlah++;
   } else {
     cart.push({
-      kode: buku.kode,
-      judul: buku.judul,
-      harga: buku.harga,
-      upbjj: buku.upbjj,
+      kode: item.kode,
+      judul: item.judul,
+      harga: item.harga,
+      upbjj: item.upbjj,
       jumlah: 1
     });
   }
 
   localStorage.setItem("cart", JSON.stringify(cart));
-
   alert("Buku dimasukkan ke keranjang!");
+};
+
+/* Reset filter */
+const resetFilter = () => {
+  filterKategori.value = "";
+  filterUpbjj.value = "";
+  filterRak.value = "";
+  sortBy.value = "";
 };
 </script>
