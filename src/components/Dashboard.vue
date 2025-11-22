@@ -49,9 +49,14 @@
         <Stok :user="user" />
       </div>
 
-      <!-- TRACKING -->
+      <!-- TRACKING (User) -->
       <div v-if="currentPage === 'tracking'">
         <Tracking :user="user" />
+      </div>
+
+      <!-- TRACKING ADMIN (Admin Only) -->
+      <div v-if="currentPage === 'tracking-admin' && user.role === 'admin'">
+        <TrackingAdmin :user="user" />
       </div>
 
       <!-- KERANJANG -->
@@ -73,6 +78,7 @@ import Footer from './Footer.vue'
 
 import Stok from './Stok.vue'
 import Tracking from './Tracking.vue'
+import TrackingAdmin from './TrackingAdmin.vue'   // ✅ DITAMBAHKAN
 import Keranjang from './Keranjang.vue'
 
 import avatarLaki from '../img/lakilaki.png'
@@ -107,7 +113,6 @@ const logout = () => {
 }
 
 .dashboard-content {
-   /* navbar fix */
   padding-bottom: 40px;
 }
 

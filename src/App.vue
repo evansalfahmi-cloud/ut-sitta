@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar.vue";
 import Dashboard from "./components/Dashboard.vue";
 import Stok from "./components/Stok.vue";
 import Tracking from "./components/Tracking.vue";
+import TrackingAdmin from "./components/TrackingAdmin.vue";
 import Keranjang from "./components/Keranjang.vue";
 
 /* LOGIN */
@@ -37,12 +38,28 @@ const logoutUser = () => {
 
 /* HALAMAN DINAMIS */
 const currentPageComponent = computed(() => {
+  if (!userData.value) return Dashboard;
+
   switch (currentPage.value) {
-    case "dashboard": return Dashboard;
-    case "stok": return Stok;
-    case "tracking": return Tracking;
-    case "keranjang": return Keranjang;
-    default: return Dashboard;
+    case "dashboard":
+      return Dashboard;
+
+    case "stok":
+      return Stok;
+
+    case "tracking":
+      // Admin → TrackingAdmin.vue
+      if (userData.value.role === "admin") {
+        return TrackingAdmin;
+      }
+      // User biasa → Tracking.vue
+      return Tracking;
+
+    case "keranjang":
+      return Keranjang;
+
+    default:
+      return Dashboard;
   }
 });
 </script>

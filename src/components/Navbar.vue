@@ -20,30 +20,42 @@
       </button>
 
       <!-- Menu -->
-      <div class="collapse navbar-collapse" id="navMenu">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0 small">
+     <!-- Menu -->
+<div class="collapse navbar-collapse" id="navMenu">
+  <ul class="navbar-nav me-auto mb-2 mb-lg-0 small">
 
-          <li class="nav-item">
-            <a class="nav-link" :class="{ active: currentPage === 'home' }"
-               href="#" @click.prevent="$emit('changePage','home')">Home</a>
-          </li>
+    <li class="nav-item">
+      <a class="nav-link" :class="{ active: currentPage === 'home' }"
+         href="#" @click.prevent="$emit('changePage','home')">Home</a>
+    </li>
 
-          <li class="nav-item">
-            <a class="nav-link" :class="{ active: currentPage === 'stok' }"
-               href="#" @click.prevent="$emit('changePage','stok')">Stok</a>
-          </li>
+    <li class="nav-item">
+      <a class="nav-link" :class="{ active: currentPage === 'stok' }"
+         href="#" @click.prevent="$emit('changePage','stok')">Stok</a>
+    </li>
 
-          <li class="nav-item">
-            <a class="nav-link" :class="{ active: currentPage === 'keranjang' }"
-               href="#" @click.prevent="$emit('changePage','keranjang')">Keranjang</a>
-          </li>
+    <li class="nav-item">
+      <a class="nav-link" :class="{ active: currentPage === 'keranjang' }"
+         href="#" @click.prevent="$emit('changePage','keranjang')">Keranjang</a>
+    </li>
 
-          <li class="nav-item">
-            <a class="nav-link" :class="{ active: currentPage === 'tracking' }"
-               href="#" @click.prevent="$emit('changePage','tracking')">Tracking</a>
-          </li>
+    <li class="nav-item">
+      <a class="nav-link" :class="{ active: currentPage === 'tracking' }"
+         href="#" @click.prevent="$emit('changePage','tracking')">Tracking</a>
+    </li>
 
-        </ul>
+    <!-- ✅ MENU TAMBAHAN UNTUK ADMIN -->
+    <li class="nav-item" v-if="user.role === 'admin'">
+      <a class="nav-link text-warning fw-bold"
+         :class="{ active: currentPage === 'tracking-admin' }"
+         href="#"
+         @click.prevent="$emit('changePage','tracking-admin')">
+        Tracking Admin
+      </a>
+    </li>
+
+  </ul>
+
 
         <!-- USER -->
         <span class="navbar-text text-white me-3 fw-semibold small">
