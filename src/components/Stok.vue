@@ -3,7 +3,61 @@
 
     <h3 class="fw-bold mb-3">Stok Bahan Ajar</h3>
 
-    <!-- ADMIN: Tombol tambah buku -->
+    <!-- ========================== FILTER & SORT ========================== -->
+<div class="row g-3 mb-3 align-items-end">
+
+  <!-- Filter Kategori -->
+  <div class="col-md-3">
+    <label class="form-label fw-semibold small">Kategori</label>
+    <select v-model="filterKategori" class="form-select">
+      <option value="">Semua</option>
+      <option v-for="kat in kategoriList" :key="kat">{{ kat }}</option>
+    </select>
+  </div>
+
+  <!-- Filter UPBJJ -->
+  <div class="col-md-3">
+    <label class="form-label fw-semibold small">UPBJJ</label>
+    <select v-model="filterUpbjj" class="form-select">
+      <option value="">Semua</option>
+      <option v-for="u in upbjjList" :key="u">{{ u }}</option>
+    </select>
+  </div>
+
+  <!-- Filter Lokasi Rak -->
+  <div class="col-md-3">
+    <label class="form-label fw-semibold small">Lokasi Rak</label>
+    <select v-model="filterRak" class="form-select">
+      <option value="">Semua</option>
+      <option v-for="rak in rakList" :key="rak">{{ rak }}</option>
+    </select>
+  </div>
+
+  <!-- Sorting -->
+  <div class="col-md-2">
+    <label class="form-label fw-semibold small">Urutkan</label>
+    <select v-model="sortBy" class="form-select">
+      <option value="">Default</option>
+      <option value="judul-asc">Judul (A-Z)</option>
+      <option value="judul-desc">Judul (Z-A)</option>
+      <option value="harga-asc">Harga Termurah</option>
+      <option value="harga-desc">Harga Termahal</option>
+      <option value="qty-desc">Stok Terbanyak</option>
+      <option value="qty-asc">Stok Tersedikit</option>
+    </select>
+  </div>
+
+  <!-- RESET BUTTON -->
+  <div class="col-md-1 text-start">
+    <button class="btn btn-secondary btn-sm w-100" @click="resetFilter">
+      Reset
+    </button>
+  </div>
+
+</div>
+
+
+    <!-- ========================== ADMIN TAMBAH BUKU =========================== -->
     <div class="mb-3" v-if="user.role === 'admin'">
       <button class="btn btn-primary btn-sm" @click="showAddForm = !showAddForm">
         <i class="bi bi-plus-circle"></i> Tambah Buku
@@ -53,7 +107,7 @@
       </div>
     </div>
 
-    <!-- TABEL RESPONSIVE -->
+    <!-- ============================== TABEL ================================ -->
     <div class="table-responsive">
       <table class="table table-bordered table-striped align-middle text-center">
         <thead class="table-dark">
@@ -72,48 +126,43 @@
         </thead>
 
         <tbody>
-          <tr v-for="(buku, index) in stok" :key="buku.kode">
+          <tr v-for="(buku, index) in sortedData" :key="buku.kode">
             <td>{{ buku.kode }}</td>
             <td class="text-start">{{ buku.judul }}</td>
             <td>{{ buku.upbjj }}</td>
             <td>{{ buku.lokasiRak }}</td>
             <td>Rp {{ buku.harga.toLocaleString() }}</td>
 
-            <!-- Qty -->
             <td>
               <div class="d-flex flex-column align-items-center">
                 <span class="fw-bold">{{ buku.qty }}</span>
 
                 <div v-if="user.role === 'admin'" class="btn-group mt-1">
-                  <button class="btn btn-sm btn-success" @click="buku.qty++">+</button>
-                  <button class="btn btn-sm btn-warning" @click="buku.qty > 0 ? buku.qty-- : null">-</button>
+                  <button class="btn btn-sm btn-success" @click="increaseQty(index)">+</button>
+                  <button class="btn btn-sm btn-warning" @click="decreaseQty(index)">-</button>
                 </div>
               </div>
             </td>
 
             <td>{{ buku.safety }}</td>
 
-            <!-- STATUS -->
             <td>
-              <span 
-                class="badge"
-                :class="buku.qty >= buku.safety ? 'bg-success' : 'bg-danger'"
-              >
+              <span class="badge"
+                :class="buku.qty >= buku.safety ? 'bg-success' : 'bg-danger'">
                 {{ buku.qty >= buku.safety ? 'Aman' : 'Menipis' }}
               </span>
             </td>
 
-            <!-- Catatan -->
             <td class="text-start">
               <span v-html="buku.catatanHTML"></span>
             </td>
 
-            <!-- Delete -->
             <td v-if="user.role === 'admin'">
               <button class="btn btn-danger btn-sm" @click="deleteBook(index)">
                 <i class="bi bi-trash"></i>
               </button>
             </td>
+
           </tr>
         </tbody>
       </table>
@@ -123,14 +172,73 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { dataStok } from "../data/stok.js";
 
-const props = defineProps({
-  user: Object,
+const props = defineProps({ user: Object });
+
+/* ---------------------- LOCALSTORAGE SYNC ---------------------- */
+const loadStok = () => {
+  const saved = localStorage.getItem("stokData");
+  return saved ? JSON.parse(saved) : dataStok;
+};
+
+const stok = ref(loadStok());
+
+const saveStok = () => {
+  localStorage.setItem("stokData", JSON.stringify(stok.value));
+};
+
+/* ---------------------- FILTER STATE --------------------------- */
+const filterKategori = ref("");
+const filterUpbjj = ref("");
+const filterRak = ref("");
+const sortBy = ref("");
+
+/* ---------------------- LIST UNIQUE --------------------------- */
+const kategoriList = [...new Set(dataStok.map(s => s.kategori))];
+const upbjjList = [...new Set(dataStok.map(s => s.upbjj))];
+const rakList = [...new Set(dataStok.map(s => s.lokasiRak))];
+
+/* ---------------------- FILTER + SORT --------------------------- */
+const filteredData = computed(() => {
+  return stok.value.filter(buku => {
+    return (
+      (!filterKategori.value || buku.kategori === filterKategori.value) &&
+      (!filterUpbjj.value || buku.upbjj === filterUpbjj.value) &&
+      (!filterRak.value || buku.lokasiRak === filterRak.value)
+    );
+  });
 });
 
-const stok = ref([...dataStok]);
+const sortedData = computed(() => {
+  let data = [...filteredData.value];
+
+  switch (sortBy.value) {
+    case "judul-asc":
+      data.sort((a, b) => a.judul.localeCompare(b.judul));
+      break;
+    case "judul-desc":
+      data.sort((a, b) => b.judul.localeCompare(a.judul));
+      break;
+    case "harga-asc":
+      data.sort((a, b) => a.harga - b.harga);
+      break;
+    case "harga-desc":
+      data.sort((a, b) => b.harga - a.harga);
+      break;
+    case "qty-asc":
+      data.sort((a, b) => a.qty - b.qty);
+      break;
+    case "qty-desc":
+      data.sort((a, b) => b.qty - a.qty);
+      break;
+  }
+
+  return data;
+});
+
+/* ---------------------- ACTION --------------------------- */
 const showAddForm = ref(false);
 
 const newBook = ref({
@@ -152,6 +260,7 @@ const addBook = () => {
   }
 
   stok.value.push({ ...newBook.value });
+  saveStok();
 
   newBook.value = {
     kode: "",
@@ -169,12 +278,26 @@ const addBook = () => {
 };
 
 const deleteBook = (index) => {
-  if (confirm("Yakin ingin menghapus buku ini?")) {
+  if (confirm("Hapus buku ini?")) {
     stok.value.splice(index, 1);
+    saveStok();
   }
 };
-</script>
 
-<style scoped>
-/* Tidak ada styling tambahan sesuai permintaan */
-</style>
+const increaseQty = (i) => {
+  stok.value[i].qty++;
+  saveStok();
+};
+
+const decreaseQty = (i) => {
+  if (stok.value[i].qty > 0) stok.value[i].qty--;
+  saveStok();
+};
+
+const resetFilter = () => {
+  filterKategori.value = "";
+  filterUpbjj.value = "";
+  filterRak.value = "";
+  sortBy.value = "";
+};
+</script>
