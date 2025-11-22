@@ -104,10 +104,11 @@ const logout = () => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  padding-top: 40px;
 }
 
 .dashboard-content {
-  padding-top: 80px; /* navbar fix */
+   /* navbar fix */
   padding-bottom: 40px;
 }
 

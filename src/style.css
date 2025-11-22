@@ -37,7 +37,7 @@ body, input, button, select, textarea, label {
 ============================= */
 html, body {
   margin: 0;
-  padding: 0;
+  padding-top: 0;
   width: 100%;
   min-height: 100vh;
   background-color: #ffffff !important;  /* Putih bersih */
