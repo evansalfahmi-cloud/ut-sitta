@@ -12,13 +12,13 @@
     <form @submit.prevent="login">
       <!-- Username -->
       <div class="mb-3 text-start">
-        <label for="username" class="form-label">Username</label>
+        <label for="username" class="form-label">NIM</label>
         <input 
           type="text" 
           v-model="username" 
           class="form-control" 
           id="username" 
-          placeholder="Masukkan username"
+          placeholder="Masukkan NIM"
           required
         >
       </div>
@@ -62,7 +62,8 @@
 
 <script setup>
 import { ref } from 'vue'
-import logoUT from '../img/ut.svg'   // logo UT dari folder src/img
+import logoUT from '../img/ut.svg'
+import { dataMahasiswa } from '../data/datauser.js'   // Import data mahasiswa
 
 const username = ref('')
 const password = ref('')
@@ -80,11 +81,30 @@ const login = () => {
 
   setTimeout(() => {
     loading.value = false
-    if (username.value === 'admin' && password.value === '1234') {
-      alert('Login berhasil!')
-    } else {
-      error.value = 'Username atau password salah!'
+    
+    // Cari user berdasarkan NIM
+    const user = dataMahasiswa.find(m => m.nim === username.value)
+
+    if (!user) {
+      error.value = "NIM tidak ditemukan!"
+      return
     }
-  }, 1500)
+
+    // Cocokkan password
+    if (password.value !== user.password) {
+      error.value = "Password salah!"
+      return
+    }
+
+    // LOGIN BERHASIL
+    alert(`Selamat datang, ${user.nama}!`)
+    
+    // Simpan user ke localStorage (opsional)
+    localStorage.setItem("userLogin", JSON.stringify(user))
+
+    // Bisa redirect ke dashboard nanti
+    // window.location.href = "/dashboard"
+    
+  }, 1200)
 }
 </script>
