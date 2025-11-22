@@ -3,8 +3,19 @@
 
     <h3 class="fw-bold mb-3">Tracking Pengiriman</h3>
 
+    <!-- 🔍 PENCARIAN KHUSUS ADMIN -->
+    <div v-if="user?.role === 'admin'" class="mb-3">
+      <label class="form-label fw-semibold">Cari berdasarkan Kode DO</label>
+      <input 
+        type="text" 
+        class="form-control"
+        v-model="searchDO"
+        placeholder="Masukkan Kode DO..."
+      >
+    </div>
+
     <div v-if="filteredTracking.length === 0" class="alert alert-info text-center">
-      Belum ada transaksi atau pengiriman yang bisa ditampilkan.
+      Tidak ada data pengiriman yang cocok.
     </div>
 
     <div v-else>
@@ -73,6 +84,9 @@ import { ref, computed, onMounted } from "vue";
 const tracking = ref([]);
 const user = ref(null);
 
+/* SEARCH INPUT (ADMIN ONLY) */
+const searchDO = ref("");
+
 /* LOAD TRACKING */
 const loadTracking = () => {
   tracking.value = JSON.parse(localStorage.getItem("tracking") || "[]");
@@ -84,14 +98,25 @@ const loadUser = () => {
 };
 
 /* FILTERING:
-   - Admin: semua data tracking
-   - User biasa: hanya tracking miliknya
+   - Admin: semua data, tapi bisa cari DO
+   - User biasa: hanya datanya sendiri
 */
 const filteredTracking = computed(() => {
   if (!user.value) return [];
 
+  let data = [];
+
   if (user.value.role === "admin") {
-    return tracking.value;
+    data = tracking.value;
+
+    // 🔍 FILTER PENCARIAN DO
+    if (searchDO.value.trim() !== "") {
+      data = data.filter((t) =>
+        t.do.toLowerCase().includes(searchDO.value.toLowerCase())
+      );
+    }
+
+    return data;
   }
 
   // user biasa → hanya data miliknya
