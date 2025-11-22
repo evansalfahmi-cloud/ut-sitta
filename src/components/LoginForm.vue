@@ -12,12 +12,11 @@
     <form @submit.prevent="login">
       <!-- Username -->
       <div class="mb-3 text-start">
-        <label for="username" class="form-label">NIM</label>
+        <label class="form-label">NIM</label>
         <input 
           type="text" 
           v-model="username" 
-          class="form-control" 
-          id="username" 
+          class="form-control"
           placeholder="Masukkan NIM"
           required
         >
@@ -25,29 +24,27 @@
 
       <!-- Password -->
       <div class="mb-3 position-relative text-start">
-        <label for="password" class="form-label">Password</label>
+        <label class="form-label">Password</label>
         <input 
           :type="showPassword ? 'text' : 'password'" 
           v-model="password" 
-          class="form-control" 
-          id="password" 
+          class="form-control"
           placeholder="Masukkan password"
           required
         >
-        <!-- Icon mata -->
         <i 
-          class="bi" 
-          :class="showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'" 
+          class="bi"
+          :class="showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'"
           @click="togglePassword"
           style="position:absolute; right:10px; top:38px; cursor:pointer;"
         ></i>
       </div>
 
-      <!-- Login Button -->
+      <!-- Button -->
       <button 
         type="submit" 
         class="btn btn-warning w-100 fw-semibold py-2"
-        :disabled="!username || !password || loading"
+        :disabled="loading"
       >
         <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
         Login
@@ -56,6 +53,14 @@
 
     <!-- Error -->
     <div v-if="error" class="alert alert-danger mt-3">{{ error }}</div>
+
+    <!-- Popup Login Berhasil -->
+    <div v-if="showSuccess" class="success-popup">
+      <div class="popup-box">
+        <i class="bi bi-check-circle-fill text-success" style="font-size: 60px;"></i>
+        <h4 class="mt-3 fw-bold">Login Berhasil</h4>
+      </div>
+    </div>
 
   </div>
 </template>
@@ -70,6 +75,7 @@ const password = ref('')
 const showPassword = ref(false)
 const loading = ref(false)
 const error = ref('')
+const showSuccess = ref(false)
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
@@ -90,18 +96,60 @@ const login = () => {
       return
     }
 
-    // Cocokkan password
     if (password.value !== user.password) {
       error.value = "Password salah!"
       return
     }
 
-    // LOGIN BERHASIL → Simpan data user
+    // Simpan user
     localStorage.setItem("userLogin", JSON.stringify(user))
 
-    // Redirect ke App.vue
-    window.location.href = "/"
+    // 🎉 MUNCULKAN POPUP BERHASIL
+    showSuccess.value = true
+
+    // Tunggu 1.5 detik → redirect
+    setTimeout(() => {
+      window.location.href = "/"
+    }, 1500)
 
   }, 1200)
 }
 </script>
+
+<style scoped>
+/* POPUP FULLSCREEN */
+.success-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-in-out;
+  z-index: 9999;
+}
+
+/* KOTAK POPUP */
+.popup-box {
+  background: white;
+  padding: 30px;
+  border-radius: 18px;
+  text-align: center;
+  width: 260px;
+  animation: zoomIn 0.3s ease-in-out;
+}
+
+/* ANIMASI */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.4); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+</style>
