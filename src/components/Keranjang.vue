@@ -45,7 +45,7 @@
 
       <!-- TOTAL HARGA BUKU -->
       <div class="text-end fw-bold fs-5 mt-3">
-        Total Harga Buku:  
+        Total Harga Buku:
         <span class="text-primary">Rp {{ totalHarga.toLocaleString() }}</span>
       </div>
 
@@ -95,7 +95,7 @@
 
         <p class="mt-2">
           Total Pembayaran:<br>
-          <span class="fw-bold text-primary">Rp {{ totalAkhir.toLocaleString() }}</span>
+          <span class="fw-bold text-primary">Rp {{ popupTotal.toLocaleString() }}</span>
         </p>
 
         <p class="text-muted small">
@@ -111,11 +111,11 @@
   </div>
 </template>
 
-  <script setup>
+<script setup>
 import { ref, computed, onMounted } from "vue";
 
 /* =======================================================
-   LOAD CART
+   LOAD & SAVE CART
 ======================================================= */
 const cart = ref([]);
 
@@ -128,7 +128,7 @@ const saveCart = () => {
 };
 
 /* =======================================================
-   LOAD & SAVE STOK
+   STOK DATA
 ======================================================= */
 const loadStok = () => JSON.parse(localStorage.getItem("stokData") || "[]");
 
@@ -136,7 +136,7 @@ const saveStok = (data) =>
   localStorage.setItem("stokData", JSON.stringify(data));
 
 /* =======================================================
-   REMOVE ITEM
+   HAPUS ITEM KERANJANG
 ======================================================= */
 const removeFromCart = (index) => {
   const buku = cart.value[index];
@@ -154,17 +154,14 @@ const removeFromCart = (index) => {
 };
 
 /* =======================================================
-   TOTAL HARGA BUKU
+   TOTAL HARGA
 ======================================================= */
 const totalHarga = computed(() =>
-  cart.value.reduce(
-    (sum, item) => sum + item.harga * item.jumlah,
-    0
-  )
+  cart.value.reduce((sum, item) => sum + item.harga * item.jumlah, 0)
 );
 
 /* =======================================================
-   KURIR & ONGKIR
+   ONGKIR & TOTAL AKHIR
 ======================================================= */
 const kurir = ref("");
 
@@ -177,33 +174,29 @@ const ongkir = computed(() => {
 const totalAkhir = computed(() => totalHarga.value + ongkir.value);
 
 /* =======================================================
-   TRACKING GENERATOR
+   CHECKOUT
 ======================================================= */
+const checkoutSuccess = ref(false);
+const popupTotal = ref(0); // nilai total FIX untuk popup
+
 const generateDOCode = () => {
   let all = JSON.parse(localStorage.getItem("tracking") || "[]");
   let next = String(all.length + 1).padStart(4, "0");
   return `DO2025-${next}`;
 };
 
-/* =======================================================
-   CHECKOUT
-======================================================= */
-const checkoutSuccess = ref(false);
-
 const checkout = () => {
-  if (kurir.value === "")
-    return alert("Silakan pilih kurir terlebih dahulu.");
+  if (!kurir.value) return alert("Silakan pilih kurir.");
+  if (cart.value.length === 0) return alert("Keranjang masih kosong.");
 
-  if (cart.value.length === 0)
-    return alert("Keranjang masih kosong.");
-
-  // Ambil user login
   const user = JSON.parse(localStorage.getItem("userLogin") || "{}");
 
-  // Buat kode DO
   const kodeDO = generateDOCode();
 
-  // Tanggal kirim realtime
+  // TOTAL FIX sebelum keranjang dikosongkan (PERBAIKAN)
+  const totalFix = totalAkhir.value;
+  popupTotal.value = totalFix;
+
   const now = new Date();
   const tgl =
     now.toLocaleDateString("id-ID") +
@@ -212,7 +205,7 @@ const checkout = () => {
     ":" +
     now.getMinutes().toString().padStart(2, "0");
 
-  // Simpan ke localStorage tracking
+  // Simpan tracking
   let trackingList = JSON.parse(localStorage.getItem("tracking") || "[]");
 
   trackingList.push({
@@ -220,20 +213,20 @@ const checkout = () => {
     tanggal: tgl,
     kurir: kurir.value,
     ongkir: ongkir.value,
-    totalBayar: totalAkhir.value,
+    totalBayar: totalFix,
     status: "Dalam Proses Pengiriman",
     user: {
       nama: user.nama,
       nim: user.nim,
       prodi: user.prodi,
-      upbjj: user.upbjj
+      upbjj: user.upbjj,
     },
-    buku: cart.value
+    buku: cart.value,
   });
 
   localStorage.setItem("tracking", JSON.stringify(trackingList));
 
-  // Kosongkan keranjang
+  // Kosongkan keranjang setelah total dihitung
   cart.value = [];
   saveCart();
 
@@ -244,7 +237,6 @@ const closePopup = () => (checkoutSuccess.value = false);
 
 onMounted(loadCart);
 </script>
-
 
 <style scoped>
 .popup-overlay {
