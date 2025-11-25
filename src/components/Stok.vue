@@ -3,9 +3,10 @@
 
     <h3 class="fw-bold mb-3">Stok Bahan Ajar</h3>
 
-    <!-- FILTER & SORT -->
+    <!-- FILTER -->
     <div class="row g-3 mb-3 align-items-end">
 
+      <!-- Kategori -->
       <div class="col-md-3">
         <label class="form-label fw-semibold small">Kategori</label>
         <select v-model="filterKategori" class="form-select">
@@ -14,14 +15,16 @@
         </select>
       </div>
 
+      <!-- UPBJJ -->
       <div class="col-md-3">
         <label class="form-label fw-semibold small">UPBJJ</label>
         <select v-model="filterUpbjj" class="form-select">
           <option value="">Semua</option>
-          <option v-for="u in upbjjList" :key="u">{{ u }}</option>
+          <option v-for="up in upbjjList" :key="up">{{ up }}</option>
         </select>
       </div>
 
+      <!-- Rak -->
       <div class="col-md-3">
         <label class="form-label fw-semibold small">Lokasi Rak</label>
         <select v-model="filterRak" class="form-select">
@@ -30,6 +33,7 @@
         </select>
       </div>
 
+      <!-- Urutkan -->
       <div class="col-md-2">
         <label class="form-label fw-semibold small">Urutkan</label>
         <select v-model="sortBy" class="form-select">
@@ -43,8 +47,15 @@
         </select>
       </div>
 
+      <!-- Reset -->
       <div class="col-md-1">
         <button class="btn btn-secondary btn-sm w-100" @click="resetFilter">Reset</button>
+      </div>
+
+      <!-- Filter Tambahan -->
+      <div class="col-md-12 d-flex gap-3 mt-2">
+        <label><input type="checkbox" v-model="filterMenipis" /> Stok Menipis</label>
+        <label><input type="checkbox" v-model="filterKosong" /> Stok Kosong</label>
       </div>
 
     </div>
@@ -63,46 +74,42 @@
       <div class="row g-3">
 
         <div class="col-md-4">
-          <input v-model="newBook.kode" class="form-control" placeholder="Kode Buku">
+          <input v-model="newBook.kode" class="form-control" placeholder="Kode Buku" @keyup.enter="addBook">
         </div>
 
         <div class="col-md-8">
-          <input v-model="newBook.judul" class="form-control" placeholder="Judul Buku">
+          <input v-model="newBook.judul" class="form-control" placeholder="Judul Buku" @keyup.enter="addBook">
         </div>
 
         <div class="col-md-4">
-          <input v-model="newBook.kategori" class="form-control" placeholder="Kategori">
+          <input v-model="newBook.kategori" class="form-control" placeholder="Kategori" @keyup.enter="addBook">
         </div>
 
         <div class="col-md-4">
-          <input v-model="newBook.upbjj" class="form-control" placeholder="UPBJJ">
+          <input v-model="newBook.upbjj" class="form-control" placeholder="UPBJJ" @keyup.enter="addBook">
         </div>
 
         <div class="col-md-4">
-          <input v-model="newBook.lokasiRak" class="form-control" placeholder="Lokasi Rak">
-        </div>
-
-        <!-- FIXED → tidak pakai v-model.number -->
-        <div class="col-md-4">
-          <input v-model="newBook.harga" type="number" class="form-control" placeholder="Harga">
+          <input v-model="newBook.lokasiRak" class="form-control" placeholder="Lokasi Rak" @keyup.enter="addBook">
         </div>
 
         <div class="col-md-4">
-          <input v-model="newBook.qty" type="number" class="form-control" placeholder="Qty">
+          <input v-model="newBook.harga" type="number" class="form-control" placeholder="Harga" @keyup.enter="addBook">
         </div>
 
         <div class="col-md-4">
-          <input v-model="newBook.safety" type="number" class="form-control" placeholder="Safety">
+          <input v-model="newBook.qty" type="number" class="form-control" placeholder="Qty" @keyup.enter="addBook">
         </div>
 
-        <div class="col-12">
-          <textarea v-model="newBook.catatanHTML" class="form-control" placeholder="Catatan (HTML)"></textarea>
+        <div class="col-md-4">
+          <input v-model="newBook.safety" type="number" class="form-control" placeholder="Safety" @keyup.enter="addBook">
         </div>
 
-        <div class="col-12 text-end mt-2">
-          <button class="btn btn-secondary btn-sm me-2" @click="showAddForm = false">Batal</button>
-          <button class="btn btn-success btn-sm" @click="addBook">Simpan</button>
-        </div>
+      </div>
+
+      <div class="col-12 mt-3 text-end">
+        <button class="btn btn-secondary btn-sm me-2" @click="showAddForm = false">Batal</button>
+        <button class="btn btn-success btn-sm" @click="addBook">Simpan</button>
       </div>
     </div>
 
@@ -137,7 +144,7 @@
 
             <td>
               <div class="d-flex flex-column align-items-center">
-                <span class="fw-bold">{{ buku.qty }}</span>
+                <span class="fw-bold">{{ buku.qty }} buah</span>
 
                 <div v-if="user.role==='admin'" class="btn-group mt-1">
                   <button class="btn btn-sm btn-success" @click="increaseQty(buku.kode)">+</button>
@@ -146,9 +153,8 @@
               </div>
             </td>
 
-            <td v-if="user.role==='admin'">{{ buku.safety }}</td>
+            <td v-if="user.role==='admin'">{{ buku.safety }} buah</td>
 
-            <!-- STATUS untuk semua role -->
             <td>
               <span class="badge" :class="statusClass(buku)">
                 {{ statusText(buku) }}
@@ -181,7 +187,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { dataStok } from "../data/stok.js";
 
 const props = defineProps({ user: Object });
@@ -199,20 +205,44 @@ const saveStok = () => localStorage.setItem("stokData", JSON.stringify(stok.valu
 const filterKategori = ref("");
 const filterUpbjj = ref("");
 const filterRak = ref("");
+const filterMenipis = ref(false);
+const filterKosong = ref(false);
 const sortBy = ref("");
 
+/* WATCHERS */
+watch(filterKategori, (baru) => {
+  console.log("Filter kategori →", baru);
+});
+watch(filterUpbjj, (baru) => {
+  console.log("Filter UPBJJ →", baru);
+});
+
 /* LISTS */
-const kategoriList = computed(() => [...new Set(stok.value.map(s => s.kategori))].filter(Boolean));
-const upbjjList = computed(() => [...new Set(stok.value.map(s => s.upbjj))].filter(Boolean));
-const rakList = computed(() => [...new Set(stok.value.map(s => s.lokasiRak))].filter(Boolean));
+const kategoriList = computed(() =>
+  [...new Set(stok.value.map(s => s.kategori))]
+);
+
+const upbjjList = computed(() =>
+  [...new Set(stok.value.map(s => s.upbjj))]
+);
+
+const rakList = computed(() =>
+  [...new Set(stok.value.map(s => s.lokasiRak))]
+);
 
 /* FILTER + SORT */
 const filteredData = computed(() =>
-  stok.value.filter(b =>
-    (!filterKategori.value || b.kategori === filterKategori.value) &&
-    (!filterUpbjj.value || b.upbjj === filterUpbjj.value) &&
-    (!filterRak.value || b.lokasiRak === filterRak.value)
-  )
+  stok.value.filter(b => {
+
+    if (filterKategori.value && b.kategori !== filterKategori.value) return false;
+    if (filterUpbjj.value && b.upbjj !== filterUpbjj.value) return false;
+    if (filterRak.value && b.lokasiRak !== filterRak.value) return false;
+
+    if (filterMenipis.value && !(b.qty < b.safety)) return false;
+    if (filterKosong.value && b.qty !== 0) return false;
+
+    return true;
+  })
 );
 
 const sortedData = computed(() => {
@@ -230,7 +260,7 @@ const sortedData = computed(() => {
   return data;
 });
 
-/* ADMIN FORM */
+/* FORM ADMIN */
 const showAddForm = ref(false);
 
 const newBook = ref({
@@ -246,24 +276,20 @@ const newBook = ref({
 });
 
 const addBook = () => {
-  if (!newBook.value.kode || !newBook.value.judul) {
-    return alert("Kode dan Judul wajib diisi!");
-  }
+
+  if (!newBook.value.kode || !newBook.value.judul)
+    return alert("Kode & Judul wajib!");
 
   stok.value.push({
-    kode: newBook.value.kode,
-    judul: newBook.value.judul,
-    kategori: newBook.value.kategori,
-    upbjj: newBook.value.upbjj,
-    lokasiRak: newBook.value.lokasiRak,
+    ...newBook.value,
     harga: Number(newBook.value.harga || 0),
     qty: Number(newBook.value.qty || 0),
     safety: Number(newBook.value.safety || 0),
-    catatanHTML: newBook.value.catatanHTML
   });
 
   saveStok();
 
+  // Reset
   newBook.value = {
     kode: "",
     judul: "",
@@ -308,6 +334,7 @@ const addToCart = (kode) => {
   if (!item) return alert("Buku tidak ditemukan.");
   if (item.qty <= 0) return alert("Stok habis!");
 
+  // Kurangi stok
   item.qty--;
   saveStok();
 
@@ -343,11 +370,16 @@ const statusClass = (b) => {
   return "bg-success";
 };
 
-/* RESET */
+/* RESET FILTER */
 const resetFilter = () => {
   filterKategori.value = "";
   filterUpbjj.value = "";
   filterRak.value = "";
+  filterMenipis.value = false;
+  filterKosong.value = false;
   sortBy.value = "";
 };
 </script>
+
+<style scoped>
+</style>
