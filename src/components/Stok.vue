@@ -7,36 +7,36 @@
     <div class="row g-3 mb-3 align-items-end">
 
       <!-- Kategori -->
-      <div class="col-md-2">
+      <div class="col-md-2 filter-item">
         <label class="form-label fw-semibold small">Kategori</label>
-        <select v-model="filterKategori" class="form-select">
+        <select v-model="filterKategori" class="form-select filter-control">
           <option value="">Semua</option>
           <option v-for="kat in kategoriList" :key="kat">{{ kat }}</option>
         </select>
       </div>
 
       <!-- UPBJJ -->
-      <div class="col-md-2">
+      <div class="col-md-2 filter-item">
         <label class="form-label fw-semibold small">UPBJJ</label>
-        <select v-model="filterUpbjj" class="form-select">
+        <select v-model="filterUpbjj" class="form-select filter-control">
           <option value="">Semua</option>
           <option v-for="up in upbjjList" :key="up">{{ up }}</option>
         </select>
       </div>
 
       <!-- Rak -->
-      <div class="col-md-2">
+      <div class="col-md-2 filter-item">
         <label class="form-label fw-semibold small">Lokasi Rak</label>
-        <select v-model="filterRak" class="form-select">
+        <select v-model="filterRak" class="form-select filter-control">
           <option value="">Semua</option>
           <option v-for="rak in rakList" :key="rak">{{ rak }}</option>
         </select>
       </div>
 
       <!-- Urutkan -->
-      <div class="col-md-2">
+      <div class="col-md-2 filter-item">
         <label class="form-label fw-semibold small">Urutkan</label>
-        <select v-model="sortBy" class="form-select">
+        <select v-model="sortBy" class="form-select filter-control">
           <option value="">Default</option>
           <option value="judul-asc">Judul (A-Z)</option>
           <option value="judul-desc">Judul (Z-A)</option>
@@ -48,9 +48,9 @@
       </div>
 
       <!-- Status Stok -->
-      <div class="col-md-3">
+      <div class="col-md-3 filter-item">
         <label class="form-label fw-semibold small">Status Stok</label>
-        <select v-model="filterStatus" class="form-select">
+        <select v-model="filterStatus" class="form-select filter-control">
           <option value="">Semua</option>
           <option value="aman">Stok Aman</option>
           <option value="menipis">Stok Menipis</option>
@@ -59,8 +59,10 @@
       </div>
 
       <!-- Reset -->
-      <div class="col-md-1">
-        <button class="btn btn-secondary btn-sm w-100" @click="resetFilter">Reset</button>
+      <div class="col-md-1 filter-item">
+        <button class="btn btn-secondary btn-sm w-100 filter-control" @click="resetFilter">
+          Reset
+        </button>
       </div>
 
     </div>
@@ -142,7 +144,6 @@
             <th>Qty</th>
             <th v-if="user.role==='admin'">Safety</th>
             <th>Status</th>
-            <th>Catatan</th>
             <th v-if="user.role==='admin'">Aksi</th>
             <th v-if="user.role==='user'">Keranjang</th>
           </tr>
@@ -172,16 +173,18 @@
 
             <td v-if="user.role==='admin'">{{ buku.safety }} buah</td>
 
+            <!-- STATUS + TOOLTIP -->
             <td>
-              <span class="badge" :class="statusClass(buku)">
+              <span 
+                class="badge"
+                :class="statusClass(buku)"
+                :title="cleanHTML(buku.catatanHTML)"
+              >
                 {{ statusText(buku) }}
               </span>
             </td>
 
-            <td class="text-start">
-              <span v-html="buku.catatanHTML"></span>
-            </td>
-
+            <!-- ADMIN ONLY DELETE -->
             <td v-if="user.role==='admin'">
               <button class="btn btn-danger btn-sm"
                       @click="deleteBook(buku.kode)">
@@ -189,6 +192,7 @@
               </button>
             </td>
 
+            <!-- USER ADD TO CART -->
             <td v-if="user.role==='user'">
               <button class="btn btn-success btn-sm"
                       @click="addToCart(buku.kode)">
@@ -211,6 +215,9 @@ import { dataStok } from "../data/stok.js";
 
 const props = defineProps({ user: Object });
 
+/* CLEAN HTML FOR TOOLTIP */
+const cleanHTML = (html) => html ? html.replace(/<[^>]*>?/gm, "") : "";
+
 /* LOAD STOK */
 const loadStok = () => {
   const saved = localStorage.getItem("stokData");
@@ -231,7 +238,7 @@ const sortBy = ref("");
 /* WATCHERS */
 watch(filterKategori, (baru) => console.log("Filter kategori →", baru));
 watch(filterUpbjj, (baru) => console.log("Filter UPBJJ →", baru));
-watch(filterStatus, (baru) => console.log("Filter status stok →", baru));
+watch(filterStatus, (baru) => console.log("Filter status →", baru));
 
 /* LISTS */
 const kategoriList = computed(() =>
@@ -254,7 +261,7 @@ const filteredData = computed(() =>
     if (filterUpbjj.value && b.upbjj !== filterUpbjj.value) return false;
     if (filterRak.value && b.lokasiRak !== filterRak.value) return false;
 
-    // Status stok dropdown: AMAN / MENIPIS / KOSONG
+    // Status stok dropdown
     if (filterStatus.value === "aman" && !(b.qty >= b.safety)) return false;
     if (filterStatus.value === "menipis" && !(b.qty < b.safety && b.qty > 0)) return false;
     if (filterStatus.value === "kosong" && b.qty !== 0) return false;
@@ -405,4 +412,21 @@ const resetFilter = () => {
 </script>
 
 <style scoped>
+/* ===============================
+   FILTER TAMPILAN SERAGAM
+==================================*/
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.filter-control {
+  height: 38px !important;
+  font-size: 14px;
+}
+
+.form-label {
+  margin-bottom: 4px;
+}
 </style>
