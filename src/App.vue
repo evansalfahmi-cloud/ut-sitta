@@ -10,19 +10,30 @@ import Tracking from "./components/Tracking.vue";
 import TrackingAdmin from "./components/TrackingAdmin.vue";
 import Keranjang from "./components/Keranjang.vue";
 
-/* LOGIN */
+/* ============================
+   LOGIN STATE
+============================ */
 const isLoggedIn = ref(false);
 const userData = ref(null);
 
 onMounted(() => {
   const saved = localStorage.getItem("userLogin");
   if (saved) {
-    isLoggedIn.value = true;
     userData.value = JSON.parse(saved);
+    isLoggedIn.value = true;
   }
 });
 
-/* NAVIGASI */
+/* Dipanggil dari LoginForm.vue */
+const handleLoginSuccess = (data) => {
+  userData.value = data;
+  isLoggedIn.value = true;
+  localStorage.setItem("userLogin", JSON.stringify(data));
+};
+
+/* ============================
+   NAVIGASI HALAMAN
+============================ */
 const currentPage = ref("dashboard");
 
 const changePage = (page) => {
@@ -36,7 +47,9 @@ const logoutUser = () => {
   currentPage.value = "dashboard";
 };
 
-/* HALAMAN DINAMIS */
+/* ============================
+   DYNAMIC COMPONENT LOADER
+============================ */
 const currentPageComponent = computed(() => {
   if (!userData.value) return Dashboard;
 
@@ -48,12 +61,9 @@ const currentPageComponent = computed(() => {
       return Stok;
 
     case "tracking":
-      // Admin → TrackingAdmin.vue
-      if (userData.value.role === "admin") {
-        return TrackingAdmin;
-      }
-      // User biasa → Tracking.vue
-      return Tracking;
+      return userData.value.role === "admin"
+        ? TrackingAdmin
+        : Tracking;
 
     case "keranjang":
       return Keranjang;
@@ -67,26 +77,35 @@ const currentPageComponent = computed(() => {
 <template>
   <div>
 
-    <!-- LOGIN -->
-    <div v-if="!isLoggedIn"
-      class="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <LoginForm />
+    <!-- ============================
+         HALAMAN LOGIN
+    ============================= -->
+    <div 
+      v-if="!isLoggedIn"
+      class="d-flex justify-content-center align-items-center vh-100 bg-light"
+    >
+      <LoginForm @loginSuccess="handleLoginSuccess" />
     </div>
 
-    <!-- HALAMAN UTAMA -->
+    <!-- ============================
+         HALAMAN UTAMA 
+    ============================= -->
     <div v-else>
 
       <!-- NAVBAR -->
-      <Navbar 
+      <Navbar
         :user="userData"
         :currentPage="currentPage"
         @changePage="changePage"
         @logout="logoutUser"
       />
 
-      <!-- HALAMAN DINAMIS -->
+      <!-- KONTEN HALAMAN -->
       <div class="mt-5 pt-4 container-fluid">
-        <component :is="currentPageComponent" :user="userData" />
+        <component 
+          :is="currentPageComponent"
+          :user="userData"
+        />
       </div>
 
     </div>
