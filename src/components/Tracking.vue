@@ -3,14 +3,18 @@
 
     <h3 class="fw-bold mb-3">Tracking Pengiriman</h3>
 
-    <!-- 🔍 PENCARIAN KHUSUS ADMIN -->
+    <!-- PENCARIAN ADMIN -->
     <div v-if="user?.role === 'admin'" class="mb-3">
       <label class="form-label fw-semibold">Cari berdasarkan Kode DO</label>
+
+      <!-- ENTER = APPLY SEARCH | ESC = RESET SEARCH -->
       <input 
         type="text" 
         class="form-control"
         v-model="searchDO"
         placeholder="Masukkan Kode DO..."
+        @keyup.enter="applySearch"
+        @keyup.esc="resetSearch"
       >
     </div>
 
@@ -25,23 +29,13 @@
         class="card shadow p-3 mb-4"
       >
         <h5 class="fw-bold text-primary">Kode DO: {{ data.do }}</h5>
-        <p class="mb-1"><strong>Tanggal Kirim:</strong> {{ data.tanggal }}</p>
-        <p class="mb-1">
-          <strong>Status:</strong>
-          <span class="badge bg-warning">{{ data.status }}</span>
-        </p>
-        <p class="mb-1">
-          <strong>Kurir:</strong>
-          {{ data.kurir }} - Ongkir Rp {{ data.ongkir.toLocaleString() }}
-        </p>
-        <p class="mb-3">
-          <strong>Total Bayar:</strong>
-          Rp {{ data.totalBayar.toLocaleString() }}
-        </p>
+        <p><strong>Tanggal Kirim:</strong> {{ data.tanggal }}</p>
+        <p><strong>Status:</strong> <span class="badge bg-warning">{{ data.status }}</span></p>
+        <p><strong>Kurir:</strong> {{ data.kurir }} - Ongkir Rp {{ data.ongkir.toLocaleString() }}</p>
+        <p><strong>Total Bayar:</strong> Rp {{ data.totalBayar.toLocaleString() }}</p>
 
         <hr>
 
-        <!-- DATA USER -->
         <h6 class="fw-bold">Data Mahasiswa</h6>
         <table class="table table-bordered mb-3">
           <tr><th>Nama</th><td>{{ data.user.nama }}</td></tr>
@@ -50,7 +44,6 @@
           <tr><th>UPBJJ</th><td>{{ data.user.upbjj }}</td></tr>
         </table>
 
-        <!-- DATA BUKU -->
         <h6 class="fw-bold">Daftar Buku</h6>
         <table class="table table-striped">
           <thead class="table-dark">
@@ -72,6 +65,7 @@
             </tr>
           </tbody>
         </table>
+
       </div>
     </div>
 
@@ -84,43 +78,45 @@ import { ref, computed, onMounted } from "vue";
 const tracking = ref([]);
 const user = ref(null);
 
-/* SEARCH INPUT (ADMIN ONLY) */
+// Input pencarian
 const searchDO = ref("");
+const searchQuery = ref(""); 
 
-/* LOAD TRACKING */
+// ENTER — apply search
+const applySearch = () => {
+  searchQuery.value = searchDO.value.trim();
+};
+
+// ESC — reset search
+const resetSearch = () => {
+  searchDO.value = "";
+  searchQuery.value = "";
+};
+
+// LOAD tracking list
 const loadTracking = () => {
   tracking.value = JSON.parse(localStorage.getItem("tracking") || "[]");
 };
 
-/* LOAD USER LOGIN */
+// LOAD user login
 const loadUser = () => {
   user.value = JSON.parse(localStorage.getItem("userLogin") || "{}");
 };
 
-/* FILTERING:
-   - Admin: semua data, tapi bisa cari DO
-   - User biasa: hanya datanya sendiri
-*/
+// FILTER VIEW
 const filteredTracking = computed(() => {
   if (!user.value) return [];
 
-  let data = [];
+  let list = user.value.role === "admin"
+    ? tracking.value
+    : tracking.value.filter(t => t.user.nim === user.value.nim);
 
-  if (user.value.role === "admin") {
-    data = tracking.value;
-
-    // 🔍 FILTER PENCARIAN DO
-    if (searchDO.value.trim() !== "") {
-      data = data.filter((t) =>
-        t.do.toLowerCase().includes(searchDO.value.toLowerCase())
-      );
-    }
-
-    return data;
+  if (searchQuery.value !== "") {
+    list = list.filter(t =>
+      t.do.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
   }
-
-  // user biasa → hanya data miliknya
-  return tracking.value.filter((t) => t.user.nim === user.value.nim);
+  return list;
 });
 
 onMounted(() => {
