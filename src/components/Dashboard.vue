@@ -12,11 +12,14 @@
     <!-- CONTENT -->
     <div class="container dashboard-content" v-if="user">
 
-      <!-- HOME -->
+      <!-- HOME (Dashboard) -->
       <div v-if="currentPage === 'home'">
         <div class="card shadow p-4 mx-auto content-card">
 
-          <h3 class="text-center fw-bold mb-3">Dashboard Mahasiswa</h3>
+          <!-- Judul dinamis sesuai ROLE -->
+          <h3 class="text-center fw-bold mb-3">
+            {{ user.role === 'admin' ? 'Dashboard Admin' : 'Dashboard Mahasiswa' }}
+          </h3>
 
           <div class="text-center mb-4">
             <img 
@@ -50,17 +53,17 @@
         <Stok :user="user" />
       </div>
 
-      <!-- TRACKING (User & Admin boleh lihat Tracking biasa) -->
+      <!-- TRACKING (User & Admin bisa lihat) -->
       <div v-if="currentPage === 'tracking'">
         <Tracking :user="user" />
       </div>
 
-      <!-- TRACKING ADMIN -->
+      <!-- TRACKING ADMIN (khusus admin) -->
       <div v-if="currentPage === 'tracking-admin' && user.role === 'admin'">
         <TrackingAdmin :user="user" />
       </div>
 
-      <!-- KERANJANG (Admin tetap bisa melihat) -->
+      <!-- KERANJANG (admin & user tetap bisa akses) -->
       <div v-if="currentPage === 'keranjang'">
         <Keranjang :user="user" />
       </div>
@@ -91,18 +94,15 @@ const currentPage = ref('home')
 onMounted(() => {
   const saved = localStorage.getItem("userLogin")
   if (!saved) return window.location.href = "/"
-
   user.value = JSON.parse(saved)
 })
 
-/* Watcher tambahan (nilai tugas) */
+/* watcher (nilai tugas) */
 watch(currentPage, (baru, lama) => {
-  console.log(`Halaman berubah dari ${lama} → ${baru}`)
+  console.log(`Navigasi: ${lama} → ${baru}`)
 })
 
-const setPage = (page) => {
-  currentPage.value = page
-}
+const setPage = (page) => currentPage.value = page
 
 const logout = () => {
   localStorage.removeItem("userLogin")
@@ -117,17 +117,14 @@ const logout = () => {
   display: flex;
   flex-direction: column;
 }
-
 .dashboard-content {
   padding-bottom: 40px;
 }
-
 .content-card {
   max-width: 600px;
   margin: auto;
   border-radius: 16px;
 }
-
 .avatar-img {
   width: 90px;
   height: 120px;
