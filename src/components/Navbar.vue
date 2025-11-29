@@ -7,7 +7,7 @@
          href="#"
          @click.prevent="$emit('changePage','home')">
         <img :src="logoUT" alt="logo" height="30" class="me-2">
-        Universitas Terbuka
+        SITTA-UT
       </a>
 
       <!-- Toggle -->
