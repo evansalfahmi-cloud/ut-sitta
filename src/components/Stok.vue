@@ -3,7 +3,7 @@
 
     <h3 class="fw-bold mb-3">Stok Bahan Ajar</h3>
 
-    <!-- FILTER (semua kontrol punya panjang seragam) -->
+    <!-- FILTER -->
     <div class="filters-row mb-3">
 
       <div class="filter-item">
@@ -37,7 +37,7 @@
           <option value="judul-asc">Judul (A-Z)</option>
           <option value="judul-desc">Judul (Z-A)</option>
           <option value="harga-asc">Harga Termurah</option>
-          <option value="harga-desc">Harga Termahal</option>
+          <option value="harga-desc">Harga Ter mahal</option>
           <option value="qty-desc">Stok Terbanyak</option>
           <option value="qty-asc">Stok Tersedikit</option>
         </select>
@@ -47,150 +47,120 @@
         <label class="form-label fw-semibold small">Status Stok</label>
         <select v-model="filterStatus" class="form-select filter-control">
           <option value="">Semua</option>
-          <option value="aman">Stok Aman</option>
-          <option value="menipis">Stok Menipis</option>
-          <option value="kosong">Stok Kosong</option>
+          <option value="aman">Aman</option>
+          <option value="menipis">Menipis</option>
+          <option value="kosong">Kosong</option>
         </select>
       </div>
 
       <div class="filter-item reset-wrap">
-        <label class="form-label fw-semibold small invisible">Reset</label>
-        <button class="btn btn-secondary btn-sm w-100 filter-control" @click="resetFilter">
-          Reset
-        </button>
+        <label class="form-label invisible">Reset</label>
+        <button class="btn btn-secondary btn-sm w-100 filter-control" @click="resetFilter">Reset</button>
       </div>
     </div>
 
-    <!-- ADMIN: Tambah Buku -->
-    <div class="mb-3" v-if="user && user.role === 'admin'">
+    <!-- ADD BOOK BTN -->
+    <div class="mb-3" v-if="isAdmin">
       <button class="btn btn-primary btn-sm" @click="showAddForm = !showAddForm">
         <i class="bi bi-plus-circle"></i> Tambah Buku
       </button>
     </div>
 
-    <!-- FORM ADMIN: TAMBAH -->
-    <div v-if="showAddForm && user && user.role === 'admin'" class="card p-3 mb-3">
+    <!-- FORM TAMBAH -->
+    <div v-if="showAddForm && isAdmin" class="card p-3 mb-3">
       <h5 class="fw-bold mb-3">Tambah Buku Baru</h5>
 
       <div class="row g-3">
 
         <div class="col-md-4">
-          <input v-model="newBook.kode" class="form-control"
-                 placeholder="Kode Buku" @keyup.enter="addBook">
+          <input v-model="newBook.kode" placeholder="Kode Buku" class="form-control" @keyup.enter="addBook">
         </div>
 
         <div class="col-md-8">
-          <input v-model="newBook.judul" class="form-control"
-                 placeholder="Judul Buku" @keyup.enter="addBook">
+          <input v-model="newBook.judul" placeholder="Judul Buku" class="form-control" @keyup.enter="addBook">
         </div>
 
         <div class="col-md-4">
-          <input v-model="newBook.kategori" class="form-control"
-                 placeholder="Kategori" @keyup.enter="addBook">
+          <input v-model="newBook.kategori" placeholder="Kategori" class="form-control">
         </div>
 
         <div class="col-md-4">
-          <input v-model="newBook.upbjj" class="form-control"
-                 placeholder="UPBJJ" @keyup.enter="addBook">
+          <input v-model="newBook.upbjj" placeholder="UPBJJ" class="form-control">
         </div>
 
         <div class="col-md-4">
-          <input v-model="newBook.lokasiRak" class="form-control"
-                 placeholder="Lokasi Rak" @keyup.enter="addBook">
+          <input v-model="newBook.lokasiRak" placeholder="Lokasi Rak" class="form-control">
         </div>
 
         <div class="col-md-4">
-          <input v-model.number="newBook.harga" class="form-control" type="number"
-                 placeholder="Harga" @keyup.enter="addBook">
+          <input v-model.number="newBook.harga" type="number" placeholder="Harga" class="form-control">
         </div>
 
         <div class="col-md-4">
-          <input v-model.number="newBook.qty" class="form-control" type="number"
-                 placeholder="Qty" @keyup.enter="addBook">
+          <input v-model.number="newBook.qty" type="number" placeholder="Qty" class="form-control">
         </div>
 
         <div class="col-md-4">
-          <input v-model.number="newBook.safety" class="form-control" type="number"
-                 placeholder="Safety" @keyup.enter="addBook">
+          <input v-model.number="newBook.safety" type="number" placeholder="Safety" class="form-control">
         </div>
 
         <div class="col-12">
-          <textarea v-model="newBook.catatanHTML" class="form-control" rows="2" placeholder="Catatan (HTML) — opsional"></textarea>
+          <textarea v-model="newBook.catatanHTML" rows="2" placeholder="Catatan (opsional)" class="form-control"></textarea>
         </div>
+
       </div>
 
-      <div class="col-12 mt-3 text-end">
-        <button class="btn btn-secondary btn-sm me-2"
-                @click="showAddForm = false">Batal</button>
-        <button class="btn btn-success btn-sm"
-                @click="addBook">Simpan</button>
+      <div class="text-end mt-3">
+        <button class="btn btn-secondary btn-sm me-2" @click="showAddForm = false">Batal</button>
+        <button class="btn btn-success btn-sm" @click="addBook">Simpan</button>
       </div>
     </div>
 
-    <!-- FORM EDIT (ADMIN) -->
-    <div v-if="showEditForm && editingBook && user && user.role === 'admin'" class="card p-3 mb-3">
+    <!-- FORM EDIT -->
+    <div v-if="showEditForm && editingBook && isAdmin" class="card p-3 mb-3">
       <h5 class="fw-bold mb-3">Edit Buku</h5>
 
       <div class="row g-3">
+
         <div class="col-md-4">
-          <input v-model="editingBook.kode" class="form-control" disabled>
+          <input v-model="editingBook.kode" disabled class="form-control">
         </div>
 
         <div class="col-md-8">
           <input v-model="editingBook.judul" class="form-control" placeholder="Judul Buku">
         </div>
 
-        <div class="col-md-4">
-          <input v-model="editingBook.kategori" class="form-control" placeholder="Kategori">
-        </div>
+        <div class="col-md-4"><input v-model="editingBook.kategori" class="form-control" placeholder="Kategori"></div>
+        <div class="col-md-4"><input v-model="editingBook.upbjj" class="form-control" placeholder="UPBJJ"></div>
+        <div class="col-md-4"><input v-model="editingBook.lokasiRak" class="form-control" placeholder="Lokasi Rak"></div>
 
-        <div class="col-md-4">
-          <input v-model="editingBook.upbjj" class="form-control" placeholder="UPBJJ">
-        </div>
-
-        <div class="col-md-4">
-          <input v-model="editingBook.lokasiRak" class="form-control" placeholder="Lokasi Rak">
-        </div>
-
-        <div class="col-md-4">
-          <input v-model.number="editingBook.harga" class="form-control" type="number" placeholder="Harga">
-        </div>
-
-        <div class="col-md-4">
-          <input v-model.number="editingBook.qty" class="form-control" type="number" placeholder="Qty">
-        </div>
-
-        <div class="col-md-4">
-          <input v-model.number="editingBook.safety" class="form-control" type="number" placeholder="Safety">
-        </div>
+        <div class="col-md-4"><input v-model.number="editingBook.harga"  type="number" class="form-control" placeholder="Harga"></div>
+        <div class="col-md-4"><input v-model.number="editingBook.qty"    type="number" class="form-control" placeholder="Qty"></div>
+        <div class="col-md-4"><input v-model.number="editingBook.safety" type="number" class="form-control" placeholder="Safety"></div>
 
         <div class="col-12">
-          <textarea v-model="editingBook.catatanHTML" class="form-control" rows="2" placeholder="Catatan (HTML)"></textarea>
+          <textarea v-model="editingBook.catatanHTML" rows="2" placeholder="Catatan (opsional)" class="form-control"></textarea>
         </div>
+
       </div>
 
-      <div class="col-12 mt-3 text-end">
+      <div class="text-end mt-3">
         <button class="btn btn-secondary btn-sm me-2" @click="cancelEdit">Batal</button>
         <button class="btn btn-success btn-sm" @click="saveEdit">Simpan Perubahan</button>
       </div>
     </div>
 
-    <!-- TABEL -->
+    <!-- TABLE -->
     <div class="table-responsive">
       <table class="table table-bordered table-striped align-middle text-center">
 
         <thead class="table-dark">
           <tr>
-            <th>Kode</th>
-            <th>Judul</th>
-            <th>UPBJJ</th>
-            <th>Rak</th>
-            <th>Harga</th>
-            <th>Qty</th>
-            <th v-if="user && user.role==='admin'">Safety</th>
+            <th>Kode</th><th>Judul</th><th>UPBJJ</th><th>Rak</th><th>Harga</th><th>Qty</th>
+            <th v-if="isAdmin">Safety</th>
             <th>Status</th>
-            <th v-if="user && user.role==='admin'">Aksi</th>
-            <th>Keranjang</th> <!-- ditampilkan untuk semua role -->
+            <th v-if="isAdmin">Aksi</th>
+            <th>Keranjang</th>
           </tr>
         </thead>
 
@@ -207,45 +177,27 @@
               <div class="d-flex flex-column align-items-center">
                 <span class="fw-bold">{{ buku.qty }} buah</span>
 
-                <div v-if="user && user.role==='admin'" class="btn-group mt-1">
-                  <button class="btn btn-sm btn-success"
-                          @click="increaseQty(buku.kode)">+</button>
-                  <button class="btn btn-sm btn-warning"
-                          @click="decreaseQty(buku.kode)">-</button>
+                <div v-if="isAdmin" class="btn-group mt-1">
+                  <button class="btn btn-sm btn-success" @click="increaseQty(buku.kode)">+</button>
+                  <button class="btn btn-sm btn-warning" @click="decreaseQty(buku.kode)">-</button>
                 </div>
               </div>
             </td>
 
-            <td v-if="user && user.role==='admin'">{{ buku.safety }} buah</td>
+            <td v-if="isAdmin">{{ buku.safety }} buah</td>
 
-            <!-- STATUS + TOOLTIP (catatan muncul saat hover) -->
             <td>
-              <span
-                class="badge"
-                :class="statusClass(buku)"
-                :title="cleanHTML(buku.catatanHTML)"
-              >
+              <span class="badge" :class="statusClass(buku)" :title="cleanHTML(buku.catatanHTML)">
                 {{ statusText(buku) }}
               </span>
             </td>
 
-            <!-- ADMIN ACTIONS: EDIT + DELETE -->
-            <td v-if="user && user.role==='admin'">
-              <button class="btn btn-warning btn-sm me-1" @click="startEdit(buku)">
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn btn-danger btn-sm" @click="deleteBook(buku.kode)">
-                <i class="bi bi-trash"></i>
-              </button>
+            <td v-if="isAdmin">
+              <button class="btn btn-warning btn-sm me-1" @click="startEdit(buku)"><i class="bi bi-pencil-square"></i></button>
+              <button class="btn btn-danger btn-sm" @click="deleteBook(buku.kode)"><i class="bi bi-trash"></i></button>
             </td>
 
-            <!-- ADD TO CART (tersedia untuk semua role) -->
-            <td>
-              <button class="btn btn-success btn-sm" @click="addToCart(buku.kode)">
-                <i class="bi bi-cart-plus"></i>
-              </button>
-            </td>
-
+            <td><button class="btn btn-success btn-sm" @click="addToCart(buku.kode)"><i class="bi bi-cart-plus"></i></button></td>
           </tr>
         </tbody>
 
@@ -259,300 +211,164 @@
 import { ref, computed, watch } from "vue";
 import { dataStok } from "../data/stok.js";
 
-const props = defineProps({ user: Object });
+const props = defineProps({ user:Object });
+const isAdmin = computed(()=> props.user && props.user.role==='admin');
 
-/* CLEAN HTML FOR TOOLTIP */
-const cleanHTML = (html) => html ? String(html).replace(/<[^>]*>?/gm, "") : "";
+/* CLEAN HTML */
+const cleanHTML = html => html ? String(html).replace(/<[^>]*>?/gm,""): "";
 
-/* LOAD STOK */
-const loadStok = () => {
-  const saved = localStorage.getItem("stokData");
-  return saved ? JSON.parse(saved) : dataStok;
-};
-
+/* LOAD STORAGE */
+const loadStok = ()=> JSON.parse(localStorage.getItem("stokData") || "null") || dataStok;
 const stok = ref(loadStok());
-const saveStok = () =>
-  localStorage.setItem("stokData", JSON.stringify(stok.value));
+const saveStok =()=> localStorage.setItem("stokData",JSON.stringify(stok.value));
 
-/* FILTER STATES */
+/* FILTER */
 const filterKategori = ref("");
-const filterUpbjj = ref("");
-const filterRak = ref("");
-const filterStatus = ref("");
-const sortBy = ref("");
+const filterUpbjj   = ref("");
+const filterRak     = ref("");
+const filterStatus  = ref("");
+const sortBy        = ref("");
 
-/* WATCHERS (minimal 2 watchers wajib) */
-watch(filterKategori, (baru, lama) => {
-  console.log("Filter kategori →", baru, "(sebelumnya:", lama, ")");
-});
-watch(filterStatus, (baru) => {
-  console.log("Filter status stok →", baru);
-});
+watch(filterKategori, v=>console.log("Kategori:",v));
+watch(filterStatus,  v=>console.log("Status:",v));
 
-/* LISTS (unique values) */
-const kategoriList = computed(() =>
-  [...new Set(stok.value.map((s) => s.kategori))].filter(Boolean)
-);
-
-const upbjjList = computed(() =>
-  [...new Set(stok.value.map((s) => s.upbjj))].filter(Boolean)
-);
-
-const rakList = computed(() =>
-  [...new Set(stok.value.map((s) => s.lokasiRak))].filter(Boolean)
-);
+/* DROPDOWN LISTS */
+const kategoriList = computed(()=> [...new Set(stok.value.map(i=>i.kategori))].filter(Boolean));
+const upbjjList    = computed(()=> [...new Set(stok.value.map(i=>i.upbjj))].filter(Boolean));
+const rakList      = computed(()=> [...new Set(stok.value.map(i=>i.lokasiRak))].filter(Boolean));
 
 /* FILTER + SORT */
-const filteredData = computed(() =>
-  stok.value.filter((b) => {
-    if (filterKategori.value && b.kategori !== filterKategori.value) return false;
-    if (filterUpbjj.value && b.upbjj !== filterUpbjj.value) return false;
-    if (filterRak.value && b.lokasiRak !== filterRak.value) return false;
+const filteredData = computed(()=> stok.value.filter(b=>{
+  if(filterKategori.value && b.kategori!==filterKategori.value) return false;
+  if(filterUpbjj.value   && b.upbjj   !==filterUpbjj.value)   return false;
+  if(filterRak.value     && b.lokasiRak!==filterRak.value)   return false;
 
-    // Status stok dropdown: AMAN / MENIPIS / KOSONG
-    if (filterStatus.value === "aman" && !(Number(b.qty) >= Number(b.safety))) return false;
-    if (filterStatus.value === "menipis" && !(Number(b.qty) < Number(b.safety) && Number(b.qty) > 0)) return false;
-    if (filterStatus.value === "kosong" && Number(b.qty) !== 0) return false;
+  if(filterStatus.value==="aman"    && !(b.qty>=b.safety)) return false;
+  if(filterStatus.value==="menipis" && !(b.qty<b.safety && b.qty>0)) return false;
+  if(filterStatus.value==="kosong"  && b.qty!==0) return false;
+  return true;
+}));
 
-    return true;
-  })
-);
-
-const sortedData = computed(() => {
-  const data = [...filteredData.value];
-
-  switch (sortBy.value) {
-    case "judul-asc":
-      data.sort((a, b) => a.judul.localeCompare(b.judul));
-      break;
-    case "judul-desc":
-      data.sort((a, b) => b.judul.localeCompare(a.judul));
-      break;
-    case "harga-asc":
-      data.sort((a, b) => Number(a.harga) - Number(b.harga));
-      break;
-    case "harga-desc":
-      data.sort((a, b) => Number(b.harga) - Number(a.harga));
-      break;
-    case "qty-asc":
-      data.sort((a, b) => Number(a.qty) - Number(b.qty));
-      break;
-    case "qty-desc":
-      data.sort((a, b) => Number(b.qty) - Number(a.qty));
-      break;
-  }
-
-  return data;
+const sortedData = computed(()=>{
+  let d=[...filteredData.value];
+  if(sortBy.value==="judul-asc")  d.sort((a,b)=>a.judul.localeCompare(b.judul));
+  if(sortBy.value==="judul-desc") d.sort((a,b)=>b.judul.localeCompare(a.judul));
+  if(sortBy.value==="harga-asc")  d.sort((a,b)=>a.harga-b.harga);
+  if(sortBy.value==="harga-desc") d.sort((a,b)=>b.harga-a.harga);
+  if(sortBy.value==="qty-asc")    d.sort((a,b)=>a.qty-b.qty);
+  if(sortBy.value==="qty-desc")   d.sort((a,b)=>b.qty-a.qty);
+  return d;
 });
 
-/* ADMIN FORM (tambah) */
+/* +++++++++++++++++++++++++++++++
+     FORM ADD
+++++++++++++++++++++++++++++++++*/
 const showAddForm = ref(false);
-
 const newBook = ref({
-  kode: "",
-  judul: "",
-  kategori: "",
-  upbjj: "",
-  lokasiRak: "",
-  harga: 0,
-  qty: 0,
-  safety: 0,
-  catatanHTML: "",
+  kode:"", judul:"", kategori:"", upbjj:"", lokasiRak:"",
+  harga:null, qty:null, safety:null, catatanHTML:""
 });
 
-const addBook = () => {
-  if (!newBook.value.kode || !newBook.value.judul) {
-    return alert("Kode & Judul wajib!");
-  }
+const addBook =()=>{
+  if(!newBook.value.kode||!newBook.value.judul) return alert("Kode & Judul wajib!");
 
-  // Cek duplikat kode (opsional, tapi membantu)
-  if (stok.value.some(s => s.kode === newBook.value.kode)) {
-    return alert("Kode sudah ada. Gunakan kode unik.");
-  }
+  if(stok.value.some(s=>s.kode===newBook.value.kode)) return alert("Kode sudah ada!");
 
   stok.value.push({
     ...newBook.value,
-    harga: Number(newBook.value.harga || 0),
-    qty: Number(newBook.value.qty || 0),
-    safety: Number(newBook.value.safety || 0),
-    catatanHTML: newBook.value.catatanHTML || ""
+    harga:Number(newBook.value.harga||0),
+    qty:Number(newBook.value.qty||0),
+    safety:Number(newBook.value.safety||0),
+    catatanHTML:newBook.value.catatanHTML||""
   });
 
   saveStok();
 
-  // Reset form
-  newBook.value = {
-    kode: "",
-    judul: "",
-    kategori: "",
-    upbjj: "",
-    lokasiRak: "",
-    harga: 0,
-    qty: 0,
-    safety: 0,
-    catatanHTML: "",
-  };
+  newBook.value={ kode:"",judul:"",kategori:"",upbjj:"",lokasiRak:"",
+    harga:null,qty:null,safety:null,catatanHTML:"" };
 
-  showAddForm.value = false;
+  showAddForm.value=false;
 };
 
-/* EDIT (UPDATE DATA BUKU) */
-const editingBook = ref(null);
-const showEditForm = ref(false);
+/* +++++++++++++++++++++++++++++++
+     EDIT
+++++++++++++++++++++++++++++++++*/
+const showEditForm=ref(false);
+const editingBook=ref(null);
 
-const startEdit = (buku) => {
-  editingBook.value = { ...buku }; // salin untuk edit (prevent direct mutate)
-  showEditForm.value = true;
-  // scroll ke atas kecil kalau perlu (opsional)
-  // window.scrollTo({ top: 0, behavior: "smooth" });
+const startEdit = b=>{
+  editingBook.value={...b};
+  showEditForm.value=true;
 };
 
-const cancelEdit = () => {
-  editingBook.value = null;
-  showEditForm.value = false;
+const cancelEdit =()=>{
+  editingBook.value=null;
+  showEditForm.value=false;
 };
 
-const saveEdit = () => {
-  if (!editingBook.value || !editingBook.value.kode) return;
-  const idx = stok.value.findIndex(s => s.kode === editingBook.value.kode);
-  if (idx === -1) return alert("Buku tidak ditemukan untuk diupdate.");
+const saveEdit =()=>{
+  let i=stok.value.findIndex(s=>s.kode===editingBook.value.kode);
+  if(i<0) return alert("Data tidak ditemukan!");
 
-  stok.value[idx] = {
-    ...editingBook.value,
-    harga: Number(editingBook.value.harga || 0),
-    qty: Number(editingBook.value.qty || 0),
-    safety: Number(editingBook.value.safety || 0),
-    catatanHTML: editingBook.value.catatanHTML || ""
+  stok.value[i]={...editingBook.value,
+    harga:Number(editingBook.value.harga||0),
+    qty:Number(editingBook.value.qty||0),
+    safety:Number(editingBook.value.safety||0)
   };
 
   saveStok();
-  showEditForm.value = false;
-  editingBook.value = null;
-  alert("Data buku berhasil diperbaharui.");
+  cancelEdit();
+  alert("Data berhasil diperbaharui.");
 };
 
 /* DELETE */
-const deleteBook = (kode) => {
-  if (!confirm("Hapus buku ini?")) return;
-  stok.value = stok.value.filter((b) => b.kode !== kode);
-  saveStok();
-};
-
-/* QTY +/- */
-const increaseQty = (kode) => {
-  const item = stok.value.find((s) => s.kode === kode);
-  if (item) {
-    item.qty = Number(item.qty) + 1;
+const deleteBook = kode=>{
+  if(confirm("Hapus buku ini?")){
+    stok.value=stok.value.filter(b=>b.kode!==kode);
     saveStok();
   }
 };
 
-const decreaseQty = (kode) => {
-  const item = stok.value.find((s) => s.kode === kode);
-  if (item && Number(item.qty) > 0) {
-    item.qty = Number(item.qty) - 1;
-    saveStok();
-  }
+/* QTY */
+const increaseQty = kode=>{
+  let b=stok.value.find(s=>s.kode===kode);
+  if(b){ b.qty++; saveStok(); }
+};
+
+const decreaseQty = kode=>{
+  let b=stok.value.find(s=>s.kode===kode);
+  if(b && b.qty>0){ b.qty--; saveStok();}
 };
 
 /* CART */
-const addToCart = (kode) => {
-  const item = stok.value.find((b) => b.kode === kode);
-  if (!item) return alert("Buku tidak ditemukan.");
-  if (Number(item.qty) <= 0) return alert("Stok habis!");
+const addToCart = kode=>{
+  let item=stok.value.find(b=>b.kode===kode);
+  if(!item) return alert("Tidak ditemukan");
+  if(item.qty<=0) return alert("Stok habis!");
 
-  item.qty = Number(item.qty) - 1;
-  saveStok();
+  item.qty--; saveStok();
 
-  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-  const exist = cart.find((c) => c.kode === kode);
+  let cart=JSON.parse(localStorage.getItem("cart")||"[]");
+  let c=cart.find(i=>i.kode===kode);
 
-  if (exist) exist.jumlah = Number(exist.jumlah) + 1;
-  else
-    cart.push({
-      kode: item.kode,
-      judul: item.judul,
-      harga: item.harga,
-      upbjj: item.upbjj,
-      jumlah: 1,
-    });
-
-  localStorage.setItem("cart", JSON.stringify(cart));
-  alert("Buku ditambahkan ke keranjang!");
+  c?c.jumlah++:cart.push({kode:item.kode,judul:item.judul,harga:item.harga,upbjj:item.upbjj,jumlah:1});
+  localStorage.setItem("cart",JSON.stringify(cart));
+  alert("Masuk keranjang!");
 };
 
 /* STATUS */
-const statusText = (b) => {
-  if (Number(b.qty) === 0) return "Kosong";
-  if (Number(b.qty) < Number(b.safety)) return "Menipis";
-  return "Aman";
-};
-
-const statusClass = (b) => {
-  if (Number(b.qty) === 0) return "bg-danger";
-  if (Number(b.qty) < Number(b.safety)) return "bg-warning";
-  return "bg-success";
-};
+const statusText =b=> !b.qty?"Kosong":(b.qty<b.safety?"Menipis":"Aman");
+const statusClass=b=> !b.qty?"bg-danger":(b.qty<b.safety?"bg-warning":"bg-success");
 
 /* RESET FILTER */
-const resetFilter = () => {
-  filterKategori.value = "";
-  filterUpbjj.value = "";
-  filterRak.value = "";
-  filterStatus.value = "";
-  sortBy.value = "";
-};
+const resetFilter =()=> filterKategori.value=filterUpbjj.value=filterRak.value=filterStatus.value=sortBy.value="";
 </script>
 
 <style scoped>
-/* ===============================
-   FILTER TAMPILAN SERAGAM
-   - semua filter-control memiliki lebar sama karena parent .filters-row menggunakan flex
-==================================*/
-.filters-row {
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
-  flex-wrap: wrap;
-}
-
-/* setiap filter diberi proporsi yang sama */
-.filter-item {
-  flex: 1 1 160px; /* tumbuh, shrink, basis 160px */
-  min-width: 140px;
-  display: flex;
-  flex-direction: column;
-}
-
-.reset-wrap {
-  flex: 0 0 120px; /* reset tetap lebih kecil namun aligned */
-  min-width: 100px;
-}
-
-/* kontrol filter (select / button) agar tinggi sama */
-.filter-control {
-  height: 38px;
-  font-size: 14px;
-  width: 100%;
-}
-
-/* label rapih */
-.form-label {
-  margin-bottom: 6px;
-}
-
-/* tabel responsive: font ukuran wajar */
-.table {
-  font-size: 14px;
-}
-
-/* buat ikon tombol sedikit rapih */
-.btn .bi {
-  vertical-align: -2px;
-}
-
-/* agar textarea form tidak terlalu besar */
-.card textarea {
-  resize: vertical;
-}
+.filters-row { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+.filter-item{ flex:1 1 160px; min-width:140px; }
+.reset-wrap { flex:0 0 120px; min-width:100px;}
+.filter-control{ height:38px;font-size:14px;width:100%;}
+.table{ font-size:14px; }
+.card textarea{ resize:vertical; }
 </style>
